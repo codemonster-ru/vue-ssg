@@ -1,0 +1,44 @@
+{
+    "name": "@codemonster-ru/gitdocs",
+    "version": "0.1.0",
+    "author": "Kirill Kolesnikov",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/codemonster-ru/gitdocs.git"
+    },
+    "type": "module",
+    "description": "Static docs generator",
+    "bin": {
+        "gitdocs-ssg": "bin/cli.js"
+    },
+    "files": [
+        "dist",
+        "bin"
+    ],
+    "scripts": {
+        "dev": "vite",
+        "build:ssr": "vite build --ssr src/entry-server.ts",
+        "build:render": "tsup src/render.ts",
+        "build": "npm run build:ssr && npm run build:render",
+        "playground": "npm run build && npm link && gitdocs-ssg ./playground/content ./playground/dist"
+    },
+    "peerDependencies": {
+        "vue": "^3.5.0",
+        "@vue/server-renderer": "^3.5.0"
+    },
+    "dependencies": {
+        "@codemonster-ru/markus": "^0.5.3"
+    },
+    "devDependencies": {
+        "@types/node": "^24.3.1",
+        "@vitejs/plugin-vue": "^6.0.1",
+        "@vue/compiler-sfc": "^3.5.21",
+        "tsup": "8.5.0",
+        "typescript": "^5.9.2",
+        "vite": "^7.1.5",
+        "vite-plugin-dts": "^4.5.4",
+        "vue": "^3.5.21",
+        "@vue/server-renderer": "^3.5.21"
+    }
+}
