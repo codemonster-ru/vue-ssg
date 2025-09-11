@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "NodeNext",
+        "baseUrl": "./",
+        "esModuleInterop": true,
+        "moduleResolution": "nodenext"
+    }
+}
