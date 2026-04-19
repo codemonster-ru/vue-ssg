@@ -4,6 +4,10 @@ import { basename, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const templatesRoot = resolve(__dirname, '../templates');
+const availableTemplates = readdirSync(templatesRoot).filter((entry) => {
+    const templatePath = join(templatesRoot, entry);
+    return statSync(templatePath).isDirectory();
+});
 const args = process.argv.slice(2);
 const positionalArgs = [];
 let templateName = 'default';
@@ -36,7 +40,7 @@ for (let index = 0; index < args.length; index += 1) {
 }
 const templateDir = resolve(templatesRoot, templateName);
 if (!existsSync(templateDir)) {
-    console.error(`Unknown template "${templateName}". Available templates: default`);
+    console.error(`Unknown template "${templateName}". Available templates: ${availableTemplates.join(', ')}`);
     process.exit(1);
 }
 const targetArg = positionalArgs[0];
