@@ -1,44 +1,41 @@
 {
-    "name": "@codemonster-ru/gitdocs",
-    "version": "0.1.0",
-    "author": "Kirill Kolesnikov",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/codemonster-ru/gitdocs.git"
-    },
-    "type": "module",
-    "description": "Static docs generator",
-    "bin": {
-        "gitdocs-ssg": "bin/cli.js"
-    },
-    "files": [
-        "dist",
-        "bin"
-    ],
-    "scripts": {
-        "dev": "vite",
-        "build:ssr": "vite build --ssr src/entry-server.ts",
-        "build:render": "tsup src/render.ts",
-        "build": "npm run build:ssr && npm run build:render",
-        "playground": "npm run build && npm link && gitdocs-ssg ./playground/content ./playground/dist"
-    },
-    "peerDependencies": {
-        "vue": "^3.5.0",
-        "@vue/server-renderer": "^3.5.0"
-    },
-    "dependencies": {
-        "@codemonster-ru/markus": "^0.5.3"
-    },
-    "devDependencies": {
-        "@types/node": "^24.3.1",
-        "@vitejs/plugin-vue": "^6.0.1",
-        "@vue/compiler-sfc": "^3.5.21",
-        "tsup": "8.5.0",
-        "typescript": "^5.9.2",
-        "vite": "^7.1.5",
-        "vite-plugin-dts": "^4.5.4",
-        "vue": "^3.5.21",
-        "@vue/server-renderer": "^3.5.21"
-    }
+  "name": "@codemonster-ru/vue-ssg",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monorepo workspace for Codemonster SSG packages.",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "dev": "npm run -w @codemonster-ru/ssg-demo dev",
+    "build": "npm run -w @codemonster-ru/ssg-demo build",
+    "preview": "npm run -w @codemonster-ru/ssg-demo preview",
+    "lint": "npm run -w @codemonster-ru/ssg-demo lint && npm run -w @codemonster-ru/vue-ssg-core lint && npm run -w @codemonster-ru/create-vue-ssg lint",
+    "typecheck": "npm run -w @codemonster-ru/ssg-demo typecheck",
+    "check": "npm run -w @codemonster-ru/ssg-demo check",
+    "build:packages": "npm run -w @codemonster-ru/vue-ssg-core build",
+    "typecheck:packages": "npm run -w @codemonster-ru/vue-ssg-core typecheck && npm run -w @codemonster-ru/create-vue-ssg typecheck",
+    "pack:core": "npm pack --dry-run --workspace @codemonster-ru/vue-ssg-core",
+    "pack:create-vue-ssg": "npm pack --dry-run --workspace @codemonster-ru/create-vue-ssg",
+    "release:check": "npm run typecheck:packages && npm run build:packages && npm run pack:core && npm run pack:create-vue-ssg",
+    "changeset": "changeset",
+    "version:packages": "changeset version",
+    "release:publish": "changeset publish"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.6.1",
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.6",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-vue": "^10.8.0",
+    "globals": "^16.0.0",
+    "jiti": "^2.6.1",
+    "typescript-eslint": "^8.57.2",
+    "vue-eslint-parser": "^10.4.0"
+  }
 }

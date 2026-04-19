@@ -3,10 +3,13 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "types": ["node"],
     "strict": true,
-    "noEmit": true,
     "skipLibCheck": true,
-    "types": ["node"]
+    "declaration": false,
+    "sourceMap": false,
+    "outDir": "./bin",
+    "rootDir": "./src"
   },
-  "include": ["eslint.config.ts"]
+  "include": ["src/**/*.ts"]
 }
