@@ -11,7 +11,7 @@ Terminology in this guide:
 - core package: `@codemonster-ru/vue-ssg-core`
 - CLI package: `@codemonster-ru/create-vue-ssg`
 
-## 1. Prepare Versions
+## 1. Prepare Versions (Manual)
 
 Update versions in:
 
@@ -21,6 +21,18 @@ Update versions in:
 If `@codemonster-ru/create-vue-ssg` template depends on a new `vue-ssg-core` release, update:
 
 - `packages/create-vue-ssg/templates/default/package.json` (`@codemonster-ru/vue-ssg-core` version)
+- `packages/create-vue-ssg/templates/docs/package.json` (`@codemonster-ru/vue-ssg-core` version)
+
+Then update release notes manually in:
+
+- `packages/vue-ssg-core/CHANGELOG.md`
+- `packages/create-vue-ssg/CHANGELOG.md`
+
+Optional helper (adds `YYYY-MM-DD` to latest changelog headings if missing):
+
+```bash
+npm run changelog:date
+```
 
 ## 2. Verify Before Publish
 
@@ -50,13 +62,12 @@ Configure npm Trusted Publisher for this repository/workflow:
 
 No `NPM_TOKEN` secret is required in this mode.
 
-## 4. Tag-based Automated Release (GitHub Actions + Changesets)
+## 4. Tag-based Automated Release (GitHub Actions)
 
 Release flow:
 
-1. Add a changeset in feature PRs (`npm run changeset`).
-2. Apply version updates (`npm run version:packages`) and commit them.
-3. Create and push a release tag:
+1. Manually update package versions and changelogs, then commit changes.
+2. Create and push a release tag:
 
 ```bash
 git tag vue-ssg-core-vX.Y.Z
@@ -70,7 +81,7 @@ git tag create-vue-ssg-vX.Y.Z
 git push origin create-vue-ssg-vX.Y.Z
 ```
 
-4. `release.yml` runs per package tag, validates version/tag match, publishes the targeted package if not yet published, and creates a GitHub Release.
+3. `release.yml` runs per package tag, validates version/tag match, publishes the targeted package if not yet published, and creates a GitHub Release.
 
 ## 5. Smoke Test
 
