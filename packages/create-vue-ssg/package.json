@@ -2,6 +2,14 @@
   "name": "@codemonster-ru/create-vue-ssg",
   "version": "1.0.0",
   "description": "Scaffold a Codemonster SSG project.",
+  "keywords": [
+    "create",
+    "scaffold",
+    "vue",
+    "ssg",
+    "vite-ssg",
+    "starter"
+  ],
   "type": "module",
   "license": "MIT",
   "author": "Kirill Kolesnikov (https://github.com/kolesnikovKirill)",
