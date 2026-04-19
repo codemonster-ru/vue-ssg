@@ -100,3 +100,13 @@ Once scrolling exists, it becomes much easier to evaluate spacing, sticky
 behavior, active markers, footer transitions and how naturally the eye moves
 between the left navigation, the main article and the table of contents on the
 right.
+
+## Nested list example
+
+- Rendering checklist
+  - unordered nested point
+  - ordered nested sequence
+    1. first ordered step
+    2. second ordered step
+- Mixed item with text and nested list
+  - sub-item that stays inside the same list item context

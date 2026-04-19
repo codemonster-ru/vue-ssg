@@ -161,6 +161,10 @@ function renderBlockTokens(tokens: TokensList | undefined): string {
   return Parser.parse(tokens ?? [])
 }
 
+function renderListItemTokens(tokens: TokensList | undefined): string {
+  return Parser.parse(tokens ?? [])
+}
+
 function renderMarkdown(markdown: string, tocLevels: Set<number>): {
   blocks: DocsContentBlock[]
   tableOfContents: VfTableOfContentsItem[]
@@ -211,7 +215,7 @@ function renderMarkdown(markdown: string, tocLevels: Set<number>): {
         blocks.push({
           type: 'list',
           ordered: token.ordered,
-          items: token.items.map((item: Tokens.ListItem) => renderInline(item.tokens))
+          items: token.items.map((item: Tokens.ListItem) => renderListItemTokens(item.tokens))
         })
         break
       case 'blockquote':

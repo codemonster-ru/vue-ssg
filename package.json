@@ -21,16 +21,11 @@
     "pack:core": "npm pack --dry-run --workspace @codemonster-ru/vue-ssg-core",
     "pack:create-vue-ssg": "npm pack --dry-run --workspace @codemonster-ru/create-vue-ssg",
     "release:check": "npm run typecheck:packages && npm run build:packages && npm run pack:core && npm run pack:create-vue-ssg",
-    "changeset": "changeset",
-    "version:packages": "changeset version && node scripts/add-changelog-dates.mjs",
-    "release:publish": "changeset publish"
+    "changelog:date": "node scripts/add-changelog-dates.mjs"
   },
   "devDependencies": {
-    "@changesets/changelog-git": "^0.2.1",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.6.1",
-    "@changesets/changelog-github": "^0.5.1",
-    "@changesets/cli": "^2.29.6",
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-vue": "^10.8.0",
