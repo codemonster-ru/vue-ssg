@@ -1,0 +1,17 @@
+{
+  "changelog": [
+    "@changesets/changelog-github",
+    {
+      "repo": "codemonster-ru/vue-ssg"
+    }
+  ],
+  "commit": false,
+  "fixed": [],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [
+    "@codemonster-ru/ssg-demo"
+  ]
+}

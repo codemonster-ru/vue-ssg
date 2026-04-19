@@ -1,0 +1,38 @@
+{
+  "name": "@codemonster-ru/create-vue-ssg",
+  "version": "1.0.0",
+  "description": "Scaffold a Codemonster SSG project.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Kirill Kolesnikov (https://github.com/kolesnikovKirill)",
+  "homepage": "https://github.com/codemonster-ru/vue-ssg#readme",
+  "bugs": {
+    "url": "https://github.com/codemonster-ru/vue-ssg/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codemonster-ru/vue-ssg.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "create-vue-ssg": "./bin/create-vue-ssg.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x ./bin/create-vue-ssg.js",
+    "lint": "eslint \"src/**/*.ts\" \"templates/default/**/*.{ts,js,vue}\"",
+    "prepack": "npm run build",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.1",
+    "typescript": "^5.9.3"
+  }
+}
