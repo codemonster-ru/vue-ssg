@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@codemonster-ru/vue-ssg-core": ["../../packages/vue-ssg-core/src/index.ts"],
+      "@codemonster-ru/vue-ssg-core/*": ["../../packages/vue-ssg-core/src/*"]
+    },
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src", "env.d.ts", "vite.config.ts", "eslint.config.ts", "ssg.config.ts"]
+}

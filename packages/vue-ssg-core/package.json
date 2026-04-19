@@ -1,0 +1,52 @@
+{
+  "name": "@codemonster-ru/vue-ssg-core",
+  "version": "1.0.0",
+  "description": "Core APIs for Codemonster SSG apps.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Kirill Kolesnikov (https://github.com/kolesnikovKirill)",
+  "homepage": "https://github.com/codemonster-ru/vue-ssg#readme",
+  "bugs": {
+    "url": "https://github.com/codemonster-ru/vue-ssg/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codemonster-ru/vue-ssg.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint \"src/**/*.{ts,js}\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "vue-router": "^4.0.0 || ^5.0.0",
+    "@unhead/vue": "^2.0.0"
+  },
+  "dependencies": {
+    "@codemonster-ru/vueforge-core": "^1.17.2",
+    "github-slugger": "^2.0.0",
+    "marked": "^17.0.5"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  }
+}

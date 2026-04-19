@@ -1,9 +1,0 @@
-{
-    "name": "@codemonster-ru/gitdocs-playground",
-    "version": "0.0.1",
-    "author": "Kirill Kolesnikov",
-    "license": "MIT",
-    "scripts": {
-        "playground": "npm run build --prefix .. && npm link --prefix .. && gitdocs-ssg ./content ./dist --prefix .."
-    }
-}

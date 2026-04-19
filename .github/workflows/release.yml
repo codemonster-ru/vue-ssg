@@ -1,0 +1,176 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'vue-ssg-core-v*'
+      - 'create-vue-ssg-v*'
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish-vue-ssg-core:
+    if: startsWith(github.ref_name, 'vue-ssg-core-v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve Tag Metadata
+        id: meta
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#vue-ssg-core-v}"
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate vue-ssg-core Version Matches Tag
+        run: |
+          TAG_VERSION="${{ steps.meta.outputs.version }}"
+          CORE_VERSION=$(node -p "require('./packages/vue-ssg-core/package.json').version")
+
+          if [ "$CORE_VERSION" != "$TAG_VERSION" ]; then
+            echo "packages/vue-ssg-core/package.json version ($CORE_VERSION) does not match tag version ($TAG_VERSION)"
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Validate Build and Packages
+        run: npm run release:check
+
+      - name: Check if Version Already Published
+        id: published
+        run: |
+          PKG_NAME=$(node -p "require('./packages/vue-ssg-core/package.json').name")
+          PKG_VERSION=$(node -p "require('./packages/vue-ssg-core/package.json').version")
+
+          echo "name=$PKG_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+
+          if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish @codemonster-ru/vue-ssg-core
+        if: steps.published.outputs.publish == 'true'
+        run: npm publish --workspace @codemonster-ru/vue-ssg-core --provenance --access public
+
+      - name: Write Release Notes
+        run: |
+          cat > RELEASE_NOTES.md <<EOF_NOTES
+          Release ${{ steps.meta.outputs.tag }}
+
+          Package:
+          - ${{ steps.published.outputs.name }}@${{ steps.published.outputs.version }} (published: ${{ steps.published.outputs.publish }})
+          EOF_NOTES
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.tag }}
+          body_path: RELEASE_NOTES.md
+          generate_release_notes: false
+
+  publish-create-vue-ssg:
+    if: startsWith(github.ref_name, 'create-vue-ssg-v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Resolve Tag Metadata
+        id: meta
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#create-vue-ssg-v}"
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Validate create-vue-ssg Version Matches Tag
+        run: |
+          TAG_VERSION="${{ steps.meta.outputs.version }}"
+          CREATE_SSG_VERSION=$(node -p "require('./packages/create-vue-ssg/package.json').version")
+
+          if [ "$CREATE_SSG_VERSION" != "$TAG_VERSION" ]; then
+            echo "packages/create-vue-ssg/package.json version ($CREATE_SSG_VERSION) does not match tag version ($TAG_VERSION)"
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Validate Build and Packages
+        run: npm run release:check
+
+      - name: Check if Version Already Published
+        id: published
+        run: |
+          PKG_NAME=$(node -p "require('./packages/create-vue-ssg/package.json').name")
+          PKG_VERSION=$(node -p "require('./packages/create-vue-ssg/package.json').version")
+
+          echo "name=$PKG_NAME" >> "$GITHUB_OUTPUT"
+          echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+
+          if npm view "$PKG_NAME@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish @codemonster-ru/create-vue-ssg
+        if: steps.published.outputs.publish == 'true'
+        run: npm publish --workspace @codemonster-ru/create-vue-ssg --provenance --access public
+
+      - name: Write Release Notes
+        run: |
+          cat > RELEASE_NOTES.md <<EOF_NOTES
+          Release ${{ steps.meta.outputs.tag }}
+
+          Package:
+          - ${{ steps.published.outputs.name }}@${{ steps.published.outputs.version }} (published: ${{ steps.published.outputs.publish }})
+          EOF_NOTES
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          tag_name: ${{ steps.meta.outputs.tag }}
+          name: ${{ steps.meta.outputs.tag }}
+          body_path: RELEASE_NOTES.md
+          generate_release_notes: false
