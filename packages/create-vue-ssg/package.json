@@ -34,7 +34,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json && chmod +x ./bin/create-vue-ssg.js",
-    "lint": "eslint \"src/**/*.ts\" \"templates/default/**/*.{ts,js,vue}\"",
+    "lint": "eslint \"src/**/*.ts\" \"templates/default/**/*.{ts,js,vue}\" \"templates/docs/**/*.{ts,js,vue}\"",
     "prepack": "npm run build",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepublishOnly": "npm run typecheck && npm run build"
