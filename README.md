@@ -27,8 +27,7 @@ Monorepo workspace for Codemonster SSG packages and local development.
 - `npm run build`
 - `npm run check`
 - `npm run release:check`
-- `npm run changeset`
-- `npm run version:packages`
+- `npm run changelog:date`
 
 ## Command Scope
 
@@ -39,6 +38,6 @@ Monorepo workspace for Codemonster SSG packages and local development.
 
 ## Release
 
-See [RELEASE.md](/Users/kolesnikov_k_a/Projects/Codemonster/JS/docs/RELEASE.md) for publish steps and order.
+See [RELEASE.md](./RELEASE.md) for publish steps and order.
 
-CI is configured in [ci.yml](/Users/kolesnikov_k_a/Projects/Codemonster/JS/docs/.github/workflows/ci.yml), and tag-based Trusted Publisher release flow in [release.yml](/Users/kolesnikov_k_a/Projects/Codemonster/JS/docs/.github/workflows/release.yml).
+CI is configured in [ci.yml](./.github/workflows/ci.yml), and tag-based Trusted Publisher release flow in [release.yml](./.github/workflows/release.yml).

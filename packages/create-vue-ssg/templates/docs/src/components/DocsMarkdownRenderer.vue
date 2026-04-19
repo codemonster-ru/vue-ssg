@@ -33,19 +33,15 @@ const attrs = useAttrs()
       />
 
       <ol v-else-if="block.type === 'list' && block.ordered">
-        <li v-for="(item, itemIndex) in block.items" :key="itemIndex">
-          <!-- eslint-disable vue/no-v-html -->
-          <span v-html="item" />
-          <!-- eslint-enable vue/no-v-html -->
-        </li>
+        <!-- eslint-disable vue/no-v-html -->
+        <li v-for="(item, itemIndex) in block.items" :key="itemIndex" v-html="item" />
+        <!-- eslint-enable vue/no-v-html -->
       </ol>
 
       <ul v-else-if="block.type === 'list'">
-        <li v-for="(item, itemIndex) in block.items" :key="itemIndex">
-          <!-- eslint-disable vue/no-v-html -->
-          <span v-html="item" />
-          <!-- eslint-enable vue/no-v-html -->
-        </li>
+        <!-- eslint-disable vue/no-v-html -->
+        <li v-for="(item, itemIndex) in block.items" :key="itemIndex" v-html="item" />
+        <!-- eslint-enable vue/no-v-html -->
       </ul>
 
       <blockquote v-else-if="block.type === 'blockquote'">
