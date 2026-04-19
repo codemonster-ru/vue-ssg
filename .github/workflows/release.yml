@@ -84,12 +84,24 @@ jobs:
 
       - name: Write Release Notes
         run: |
-          cat > RELEASE_NOTES.md <<EOF_NOTES
-          Release ${{ steps.meta.outputs.tag }}
+          TAG="${{ steps.meta.outputs.tag }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+          CHANGELOG_FILE="packages/vue-ssg-core/CHANGELOG.md"
 
-          Package:
-          - ${{ steps.published.outputs.name }}@${{ steps.published.outputs.version }} (published: ${{ steps.published.outputs.publish }})
-          EOF_NOTES
+          NOTES_SECTION=$(awk -v v="$VERSION" '
+            $0 ~ "^##[[:space:]]+v?" v "([[:space:]]|$)" { in_section = 1; print; next }
+            $0 ~ "^##[[:space:]]+" { if (in_section) exit }
+            in_section { print }
+          ' "$CHANGELOG_FILE")
+
+          if [ -z "$NOTES_SECTION" ]; then
+            NOTES_SECTION=$(printf '## %s\n\nNo changelog entry found in %s for this version.\n' "$VERSION" "$CHANGELOG_FILE")
+          fi
+
+          {
+            printf 'Release %s\n\n' "$TAG"
+            printf '%s\n' "$NOTES_SECTION"
+          } > RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.5.0
@@ -172,12 +184,24 @@ jobs:
 
       - name: Write Release Notes
         run: |
-          cat > RELEASE_NOTES.md <<EOF_NOTES
-          Release ${{ steps.meta.outputs.tag }}
+          TAG="${{ steps.meta.outputs.tag }}"
+          VERSION="${{ steps.meta.outputs.version }}"
+          CHANGELOG_FILE="packages/create-vue-ssg/CHANGELOG.md"
 
-          Package:
-          - ${{ steps.published.outputs.name }}@${{ steps.published.outputs.version }} (published: ${{ steps.published.outputs.publish }})
-          EOF_NOTES
+          NOTES_SECTION=$(awk -v v="$VERSION" '
+            $0 ~ "^##[[:space:]]+v?" v "([[:space:]]|$)" { in_section = 1; print; next }
+            $0 ~ "^##[[:space:]]+" { if (in_section) exit }
+            in_section { print }
+          ' "$CHANGELOG_FILE")
+
+          if [ -z "$NOTES_SECTION" ]; then
+            NOTES_SECTION=$(printf '## %s\n\nNo changelog entry found in %s for this version.\n' "$VERSION" "$CHANGELOG_FILE")
+          fi
+
+          {
+            printf 'Release %s\n\n' "$TAG"
+            printf '%s\n' "$NOTES_SECTION"
+          } > RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.5.0
