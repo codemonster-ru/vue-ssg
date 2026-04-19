@@ -22,7 +22,7 @@
     "pack:create-vue-ssg": "npm pack --dry-run --workspace @codemonster-ru/create-vue-ssg",
     "release:check": "npm run typecheck:packages && npm run build:packages && npm run pack:core && npm run pack:create-vue-ssg",
     "changeset": "changeset",
-    "version:packages": "changeset version",
+    "version:packages": "changeset version && node scripts/add-changelog-dates.mjs",
     "release:publish": "changeset publish"
   },
   "devDependencies": {

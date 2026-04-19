@@ -1,6 +1,6 @@
 # @codemonster-ru/create-vue-ssg
 
-## 1.1.0
+## 1.1.0 - 2026-04-19
 
 ### Minor Changes
 
