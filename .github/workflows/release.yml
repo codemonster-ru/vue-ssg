@@ -57,6 +57,9 @@ jobs:
       - name: Workaround npm Optional Dependencies Bug
         run: npm i --include=optional
 
+      - name: Ensure Rollup Linux Native Binary
+        run: npm i --no-save @rollup/rollup-linux-x64-gnu
+
       - name: Validate Build and Packages
         run: npm run release:check
 
@@ -141,6 +144,9 @@ jobs:
 
       - name: Workaround npm Optional Dependencies Bug
         run: npm i --include=optional
+
+      - name: Ensure Rollup Linux Native Binary
+        run: npm i --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Validate Build and Packages
         run: npm run release:check
