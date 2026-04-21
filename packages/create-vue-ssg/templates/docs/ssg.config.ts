@@ -1,58 +1,30 @@
 import { defineDocsConfig } from '@codemonster-ru/vue-ssg-core'
 import DocsLogoIcon from './src/components/DocsLogoIcon.vue'
 
+const currentYear = new Date().getFullYear()
+
 export default defineDocsConfig({
   site: {
     title: '__PROJECT_NAME__',
-    description: 'Static documentation starter for the Codemonster Vue stack.',
+    description: 'Package documentation powered by Codemonster Vue SSG.',
     githubUrl: 'https://github.com/codemonster-ru/vue-ssg',
     homeTo: '/',
     favicon: '/logo.svg',
     logo: {
-      alt: 'Codemonster',
+      alt: '__PROJECT_NAME__',
       height: 28,
       component: DocsLogoIcon
     },
-    logoLabel: '__PROJECT_NAME__'
+    logoLabel: 'Docs'
   },
   home: {
-    title: 'Build docs fast',
-    description: 'Write markdown, keep the same UI stack, and ship clean developer docs.',
-    showGrid: true,
-    primaryAction: {
-      label: 'Get Started',
-      to: '/guide/installation'
-    },
-    secondaryAction: {
-      label: 'View on GitHub',
-      href: 'https://github.com/codemonster-ru/vue-ssg'
-    }
+    title: 'Documentation',
+    description: 'Guides and API references for your package ecosystem',
+    showGrid: true
   },
   headerNav: {
     ariaLabel: 'Main navigation',
-    items: [
-      {
-        value: 'guide',
-        label: 'Guide',
-        to: '/guide/overview'
-      },
-      {
-        value: 'components',
-        label: 'Components',
-        children: [
-          {
-            value: 'components-core',
-            label: 'Core',
-            to: '/core/theme'
-          },
-          {
-            value: 'components-layouts',
-            label: 'Layouts',
-            to: '/layouts/document-layout'
-          }
-        ]
-      }
-    ]
+    items: []
   },
   layout: {
     variant: 'sidebar-content-aside',
@@ -65,20 +37,12 @@ export default defineDocsConfig({
     hideAsideOnMobile: true
   },
   footer: {
-    left: 'Built with Codemonster Vue SSG'
+    left: `© ${currentYear} __PROJECT_NAME__`
   },
   sectionLabels: {
-    guide: {
-      label: 'Guide',
+    packages: {
+      label: 'Packages',
       order: 1
-    },
-    core: {
-      label: 'Core',
-      order: 2
-    },
-    layouts: {
-      label: 'Layouts',
-      order: 3
     }
   },
   toc: {

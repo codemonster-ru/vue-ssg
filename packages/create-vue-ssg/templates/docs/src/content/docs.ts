@@ -4,6 +4,7 @@ import {
   type DocsContentBlock,
   type DocsPage
 } from '@codemonster-ru/vue-ssg-core'
+import type { VfNavMenuItem } from '@codemonster-ru/vueforge-core'
 
 const markdownFiles = import.meta.glob('../../content/**/*.md', {
   query: '?raw',
@@ -11,15 +12,111 @@ const markdownFiles = import.meta.glob('../../content/**/*.md', {
   eager: true
 }) as Record<string, string>
 
+const packageMetadataFiles = import.meta.glob('../../content/**/metadata.json', {
+  import: 'default',
+  eager: true
+}) as Record<string, { package?: string; description?: string; latest?: string; repo?: string }>
+
 const resolvedDocsContent = resolveDocsContent({
   docsConfig,
   markdownFiles
 })
 
+export interface DocsPackage {
+  packageName: string
+  description?: string
+  pathBase: string
+  latest: string
+  repo?: string
+  slug: string
+  packageKey: string
+}
+
+function toTitleCase(value: string): string {
+  return value
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
+function normalizePath(pathname: string): string {
+  if (pathname === '/') {
+    return pathname
+  }
+
+  return pathname.replace(/\/+$/, '')
+}
+
+export function toPublicDocsPath(pathname: string): string {
+  const normalizedPath = normalizePath(pathname)
+  const match = normalizedPath.match(/^\/packages\/([^/]+)\/latest(?:\/(.+))?$/)
+
+  if (!match) {
+    return normalizedPath
+  }
+
+  const packageKey = match[1]
+  const restPath = match[2]
+
+  return restPath ? `/${packageKey}/${restPath}` : `/${packageKey}`
+}
+
+function mapSidebarToPublicPaths(items: VfNavMenuItem[]): VfNavMenuItem[] {
+  return items.map((item) => {
+    const nextItem: VfNavMenuItem = {
+      ...item
+    }
+
+    if (typeof item.to === 'string') {
+      nextItem.to = toPublicDocsPath(item.to)
+    }
+
+    if (item.children) {
+      nextItem.children = mapSidebarToPublicPaths(item.children)
+    }
+
+    return nextItem
+  })
+}
+
+const docsPages: DocsPage[] = resolvedDocsContent.docsPages.map((page) => ({
+  ...page,
+  path: toPublicDocsPath(page.path)
+}))
+
+const docsPagesByPath = new Map(docsPages.map((page) => [page.path, page] as const))
+
+const docsSidebar = mapSidebarToPublicPaths(resolvedDocsContent.docsSidebar)
+
+const docsPackages: DocsPackage[] = Object.entries(packageMetadataFiles)
+  .flatMap(([sourcePath, metadata]) => {
+    const normalizedSourcePath = sourcePath.replace(/\\/g, '/')
+    const match = normalizedSourcePath.match(/\/content\/(.+)\/metadata\.json$/)
+
+    if (!match) {
+      return []
+    }
+
+    const slug = match[1]
+    const latest = (metadata.latest ?? 'latest').trim() || 'latest'
+    const slugMatch = slug.match(/^packages\/([^/]+)$/)
+    const packageKey = slugMatch?.[1] ?? (slug.split('/').at(-1) ?? slug)
+    const fallbackName = slug.split('/').at(-1) ?? slug
+
+    return [{
+      packageName: metadata.package?.trim() || toTitleCase(fallbackName),
+      description: metadata.description?.trim(),
+      pathBase: `/${packageKey}`,
+      latest,
+      repo: metadata.repo,
+      slug,
+      packageKey
+    }]
+  })
+  .sort((left, right) => left.packageName.localeCompare(right.packageName))
+
 export type { DocsContentBlock, DocsPage }
 
-export const docsPages = resolvedDocsContent.docsPages
-export const docsSidebar = resolvedDocsContent.docsSidebar
+export { docsPages, docsSidebar }
 export const docsSite = resolvedDocsContent.docsSite
 export const docsLayout = resolvedDocsContent.docsLayout
 export const docsFooter = resolvedDocsContent.docsFooter
@@ -28,5 +125,10 @@ export const docsHeaderNav = resolvedDocsContent.docsHeaderNav
 export const docsComponents = resolvedDocsContent.docsComponents
 export const docsSiteTitle = resolvedDocsContent.docsSiteTitle
 export const docsScrollOffset = resolvedDocsContent.docsScrollOffset
+export const docsPackagesCatalog = docsPackages
 
-export const getDocsPageByPath = resolvedDocsContent.getDocsPageByPath
+export function getDocsPageByPath(pathname: string): DocsPage {
+  const normalizedPath = toPublicDocsPath(pathname)
+
+  return docsPagesByPath.get(normalizedPath) ?? docsPages[0]
+}
