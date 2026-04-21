@@ -1,0 +1,6 @@
+{
+  "package": "@your-scope/starter-kit",
+  "description": "Starter package documentation scaffolded with Codemonster Vue SSG.",
+  "repo": "https://github.com/codemonster-ru/vue-ssg",
+  "latest": "latest"
+}
