@@ -1,6 +1,14 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.2.0 - 2026-04-22
+
+### Minor Changes
+
+- Port Docs Hub homepage visuals and sidebar behavior into the `docs` template.
+- Update package docs routes and URL rules in the `docs` template content/config.
+
 ## 1.1.1 - 2026-04-19
+
 ### Patch Changes
 
 - Fix markdown nested list rendering in docs content parser to prevent SSG build failures.
