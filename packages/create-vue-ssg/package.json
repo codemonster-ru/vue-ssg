@@ -1,6 +1,6 @@
 {
   "name": "@codemonster-ru/create-vue-ssg",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Scaffold a Codemonster SSG project.",
   "keywords": [
     "create",
@@ -33,9 +33,10 @@
     "templates"
   ],
   "scripts": {
+    "clean:templates": "rm -rf ./templates/default/dist ./templates/default/node_modules ./templates/default/.vite ./templates/default/package-lock.json ./templates/docs/dist ./templates/docs/node_modules ./templates/docs/.vite ./templates/docs/package-lock.json",
     "build": "tsc -p tsconfig.json && chmod +x ./bin/create-vue-ssg.js",
     "lint": "eslint \"src/**/*.ts\" \"templates/default/**/*.{ts,js,vue}\" \"templates/docs/**/*.{ts,js,vue}\"",
-    "prepack": "npm run build",
+    "prepack": "npm run clean:templates && npm run build",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepublishOnly": "npm run typecheck && npm run build"
   },
