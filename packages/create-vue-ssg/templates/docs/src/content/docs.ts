@@ -99,8 +99,10 @@ const docsPackages: DocsPackage[] = Object.entries(packageMetadataFiles)
     const slug = match[1]
     const latest = (metadata.latest ?? 'latest').trim() || 'latest'
     const slugMatch = slug.match(/^packages\/([^/]+)$/)
-    const packageKey = slugMatch?.[1] ?? (slug.split('/').at(-1) ?? slug)
-    const fallbackName = slug.split('/').at(-1) ?? slug
+    const slugSegments = slug.split('/')
+    const slugTail = slugSegments[slugSegments.length - 1] || slug
+    const packageKey = slugMatch?.[1] ?? slugTail
+    const fallbackName = slugTail
 
     return [{
       packageName: metadata.package?.trim() || toTitleCase(fallbackName),

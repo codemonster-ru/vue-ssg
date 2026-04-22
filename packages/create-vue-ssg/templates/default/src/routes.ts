@@ -6,11 +6,17 @@ export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    meta: {
+      title: 'Home'
+    }
   },
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: NotFoundView
+    component: NotFoundView,
+    meta: {
+      title: 'Page not found'
+    }
   }
 ]

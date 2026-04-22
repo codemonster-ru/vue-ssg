@@ -82,15 +82,11 @@ function toPackageMark(displayName: string): string {
     return 'PKG'
   }
 
-  let mark = ''
-
-  if (normalizedWords.length >= 3) {
-    mark = normalizedWords.slice(0, 3).map((word) => word.charAt(0)).join('')
-  } else if (normalizedWords.length === 2) {
-    mark = normalizedWords[0].charAt(0) + normalizedWords[1].slice(0, 2)
-  } else {
-    mark = normalizedWords[0].slice(0, 3)
-  }
+  const mark = normalizedWords.length >= 3
+    ? normalizedWords.slice(0, 3).map((word) => word.charAt(0)).join('')
+    : normalizedWords.length === 2
+      ? normalizedWords[0].charAt(0) + normalizedWords[1].slice(0, 2)
+      : normalizedWords[0].slice(0, 3)
 
   const upper = mark.toUpperCase()
   if (upper.length >= 3) {

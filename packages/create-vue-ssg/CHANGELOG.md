@@ -1,5 +1,15 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.3.0 - 2026-04-22
+
+### Minor Changes
+
+- Add dynamic page titles to generated templates:
+  `default` now uses route meta titles, and `docs` now renders page-specific `<title>`.
+- Improve docs home package card layout/hover animation for consistent card height and cleaner arrow transition.
+- Replace `Array.prototype.at()` usage in docs content parsing to keep compatibility with older TypeScript lib targets.
+- Exclude template local build/install artifacts from npm publish by cleaning template `dist` and `node_modules` in `prepack`.
+
 ## 1.2.1 - 2026-04-22
 
 ### Patch Changes
