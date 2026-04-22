@@ -53,6 +53,17 @@ const currentPageMeta = computed(() => ({
   title: currentPage.value.title,
   path: currentPage.value.path
 }))
+const pageHeadTitle = computed(() => {
+  if (isHomeRoute.value) {
+    return docsSite.title
+  }
+
+  if (isNotFoundRoute.value) {
+    return `Page not found | ${docsSite.title}`
+  }
+
+  return `${currentPage.value.title} | ${docsSite.title}`
+})
 const currentPackageKey = computed(() => {
   if (isContentOnlyRoute.value) {
     return null
@@ -521,16 +532,16 @@ function handleMobileTocClick(event: MouseEvent) {
   void router.push(href)
 }
 
-useHead({
-  title: docsSite.title,
+useHead(() => ({
+  title: pageHeadTitle.value,
   link: [
     {
       rel: 'icon',
       type: 'image/svg+xml',
-      href: faviconHref
+      href: faviconHref.value
     }
   ]
-})
+}))
 </script>
 
 <template>
