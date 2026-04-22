@@ -1,5 +1,12 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.2.1 - 2026-04-22
+
+### Patch Changes
+
+- Update `@codemonster-ru/vueiconify` to `^1.3.1` in the `docs` template.
+- Replace package card hover icon from `arrowRight` to `arrowRightLong` on the `docs` template home page.
+
 ## 1.2.0 - 2026-04-22
 
 ### Minor Changes
