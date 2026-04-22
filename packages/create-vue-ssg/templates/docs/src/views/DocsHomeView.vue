@@ -187,7 +187,7 @@ function openPackageDocs(to: string): void {
           <div class="docs-home__package-body">
             <p class="docs-home__package-description">{{ card.description }}</p>
             <div class="docs-home__package-arrow" aria-hidden="true">
-              <VueIconify :icon="icons.arrowRight" :size="28" />
+              <VueIconify :icon="icons.arrowRightLong" :size="28" />
             </div>
           </div>
         </VfCard>
