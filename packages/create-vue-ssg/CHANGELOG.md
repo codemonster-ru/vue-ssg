@@ -1,5 +1,12 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.3.1 - 2026-04-23
+
+### Patch Changes
+
+- Add PNG favicons (`32x32`, `192x192`) and `apple-touch-icon` metadata to the `docs` template `<head>`.
+- Add Apache `.htaccess` rewrite rules in the `docs` template for clean URL-to-HTML mapping and SPA fallback.
+
 ## 1.3.0 - 2026-04-22
 
 ### Minor Changes
