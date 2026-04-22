@@ -11,6 +11,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "npm run -w @codemonster-ru/ssg-demo dev",
+    "dev:template:default": "npm run --prefix packages/create-vue-ssg/templates/default dev",
+    "dev:template:docs": "npm run --prefix packages/create-vue-ssg/templates/docs dev",
     "build": "npm run -w @codemonster-ru/ssg-demo build",
     "preview": "npm run -w @codemonster-ru/ssg-demo preview",
     "lint": "npm run -w @codemonster-ru/ssg-demo lint && npm run -w @codemonster-ru/vue-ssg-core lint && npm run -w @codemonster-ru/create-vue-ssg lint",
