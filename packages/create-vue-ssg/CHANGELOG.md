@@ -1,5 +1,13 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.4.0 - 2026-04-25
+
+### Minor Changes
+
+- Add optional `landingPath` in `docs` template package metadata (`content/packages/<slug>/metadata.json`) to control each package card landing page.
+- Update docs template home card routing to prioritize `landingPath` when provided, with graceful fallback to the first available package page.
+- Document `landingPath` usage in `create-vue-ssg` README.
+
 ## 1.3.1 - 2026-04-23
 
 ### Patch Changes
