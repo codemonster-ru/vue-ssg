@@ -21,6 +21,10 @@ Markdown content is loaded from `content/**/*.md` in the generated project.
 - `docs`: full docs shell matching `apps/demo`
 - `--force`: allow scaffolding into a non-empty target directory
 
+For the `docs` template package cards, you can set a custom landing page in each
+`content/packages/<slug>/metadata.json` via `landingPath` (for example,
+`"landingPath": "getting-started"`).
+
 Examples:
 
 ```bash

@@ -115,8 +115,17 @@ const packageCards = computed<DocsPackageCard[]>(() =>
 
         return left.path.localeCompare(right.path)
       })[0]
+      const explicitLandingPath = pkg.landingPath
+        ? (pkg.landingPath === 'index' || pkg.landingPath === '.'
+            ? packageRootPath
+            : `${packageRootPath}/${pkg.landingPath}`)
+        : null
+      const explicitLanding = explicitLandingPath
+        ? packagePages.find((page) => page.path === explicitLandingPath)
+        : undefined
+      const resolvedLanding = explicitLanding ?? fallbackLanding
 
-      const summaryBlock = fallbackLanding.blocks.find((block) =>
+      const summaryBlock = resolvedLanding.blocks.find((block) =>
         block.type === 'paragraph' || block.type === 'blockquote' || block.type === 'html'
       )
       const summaryText = normalizeText(
@@ -130,7 +139,7 @@ const packageCards = computed<DocsPackageCard[]>(() =>
         packageDisplayName: toPackageDisplayName(pkg.packageName),
         packageMark: toPackageMark(toPackageDisplayName(pkg.packageName)),
         description: pkg.description || summaryText || 'Package documentation from the Codemonster ecosystem.',
-        to: toPublicDocsPath(fallbackLanding.path)
+        to: toPublicDocsPath(resolvedLanding.path)
       }]
     })
 )

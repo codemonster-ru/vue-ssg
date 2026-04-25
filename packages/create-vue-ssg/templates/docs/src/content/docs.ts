@@ -15,7 +15,13 @@ const markdownFiles = import.meta.glob('../../content/**/*.md', {
 const packageMetadataFiles = import.meta.glob('../../content/**/metadata.json', {
   import: 'default',
   eager: true
-}) as Record<string, { package?: string; description?: string; latest?: string; repo?: string }>
+}) as Record<string, {
+  package?: string
+  description?: string
+  latest?: string
+  repo?: string
+  landingPath?: string
+}>
 
 const resolvedDocsContent = resolveDocsContent({
   docsConfig,
@@ -26,6 +32,7 @@ export interface DocsPackage {
   packageName: string
   description?: string
   pathBase: string
+  landingPath?: string
   latest: string
   repo?: string
   slug: string
@@ -98,6 +105,9 @@ const docsPackages: DocsPackage[] = Object.entries(packageMetadataFiles)
 
     const slug = match[1]
     const latest = (metadata.latest ?? 'latest').trim() || 'latest'
+    const landingPath = typeof metadata.landingPath === 'string'
+      ? metadata.landingPath.trim().replace(/^\/+|\/+$/g, '')
+      : undefined
     const slugMatch = slug.match(/^packages\/([^/]+)$/)
     const slugSegments = slug.split('/')
     const slugTail = slugSegments[slugSegments.length - 1] || slug
@@ -108,6 +118,7 @@ const docsPackages: DocsPackage[] = Object.entries(packageMetadataFiles)
       packageName: metadata.package?.trim() || toTitleCase(fallbackName),
       description: metadata.description?.trim(),
       pathBase: `/${packageKey}`,
+      landingPath,
       latest,
       repo: metadata.repo,
       slug,
