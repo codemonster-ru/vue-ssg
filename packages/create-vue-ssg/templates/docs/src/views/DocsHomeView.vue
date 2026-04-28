@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { VfCard } from '@codemonster-ru/vueforge-core'
 import { VueIconify, icons } from '@codemonster-ru/vueiconify'
-import { docsComponents, docsHome, docsPackagesCatalog, docsPages, docsSite, toPublicDocsPath } from '@/content/docs'
+import { docsComponents, docsHome, docsPackagesCatalog, docsPages, docsSite } from '@/content/docs'
 
 interface DocsPackageCard {
   packageName: string
@@ -99,9 +99,12 @@ function toPackageMark(displayName: string): string {
 const packageCards = computed<DocsPackageCard[]>(() =>
   docsPackagesCatalog
     .flatMap((pkg) => {
-      const packageRootPath = `/${pkg.packageKey}`
+      const packageRootPath = `/${pkg.packageKey}/`
+      const packagePathPrefix = packageRootPath.replace(/\/$/, '')
       const packagePages = docsPages.filter((page) =>
-        page.path === packageRootPath || page.path.startsWith(`${packageRootPath}/`)
+        page.path === packageRootPath ||
+        page.path === packagePathPrefix ||
+        page.path.startsWith(packageRootPath)
       )
 
       if (packagePages.length === 0) {
@@ -118,7 +121,7 @@ const packageCards = computed<DocsPackageCard[]>(() =>
       const explicitLandingPath = pkg.landingPath
         ? (pkg.landingPath === 'index' || pkg.landingPath === '.'
             ? packageRootPath
-            : `${packageRootPath}/${pkg.landingPath}`)
+            : `${packagePathPrefix}/${pkg.landingPath}`)
         : null
       const explicitLanding = explicitLandingPath
         ? packagePages.find((page) => page.path === explicitLandingPath)
@@ -139,7 +142,7 @@ const packageCards = computed<DocsPackageCard[]>(() =>
         packageDisplayName: toPackageDisplayName(pkg.packageName),
         packageMark: toPackageMark(toPackageDisplayName(pkg.packageName)),
         description: pkg.description || summaryText || 'Package documentation from the Codemonster ecosystem.',
-        to: toPublicDocsPath(resolvedLanding.path)
+        to: resolvedLanding.path
       }]
     })
 )

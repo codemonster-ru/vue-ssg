@@ -238,8 +238,7 @@ function getSidebarItemsForPackage(items: VfNavMenuItem[], packageKey: string, a
     return [targetNode]
   }
 
-  // Never expose version nodes in the sidebar UI.
-  // We pick the branch that contains the active page, then return its children directly.
+  // Package routes use the active version branch as the sidebar root.
   const activeVersionNode = packageChildren.find((child) => subtreeHasValue(child, activePageId))
   const fallbackVersionNode = packageChildren[0]
   const resolvedVersionNode = activeVersionNode ?? fallbackVersionNode
