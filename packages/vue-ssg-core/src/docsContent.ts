@@ -67,6 +67,7 @@ interface NavNode {
   order: number
   value?: string
   path?: string
+  isPage?: boolean
   children: Map<string, NavNode>
 }
 
@@ -339,6 +340,14 @@ function sortNodes(nodes: NavNode[]): NavNode[] {
   })
 }
 
+function getPageNavKey(page: DocsPage): string {
+  if (page.isIndexPage) {
+    return 'index'
+  }
+
+  return page.path.split('/').filter(Boolean).at(-1) ?? page.id
+}
+
 function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[] {
   const root = new Map<string, NavNode>()
 
@@ -356,6 +365,7 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
           order: sectionConfig?.order ?? 1_000,
           value: toValueFromPath(currentPath),
           path: currentPath,
+          isPage: false,
           children: new Map()
         })
       }
@@ -363,7 +373,7 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
       current = current.get(segment)!.children
     }
 
-    const pageKey = page.isIndexPage ? 'index' : page.id
+    const pageKey = getPageNavKey(page)
     const existingPageNode = current.get(pageKey)
 
     current.set(pageKey, {
@@ -371,6 +381,7 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
       order: page.order,
       value: page.id,
       path: page.path,
+      isPage: true,
       children: existingPageNode?.children ?? new Map()
     })
   }
@@ -384,10 +395,27 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
 
       const children = toItems(node.children)
 
-      if (children.length > 0) {
-        item.children = children
-      } else if (node.path) {
+      if (node.path && node.isPage) {
         item.to = node.path
+      }
+
+      if (children.length > 0) {
+        if (item.to) {
+          const branchValue = `${item.value}-section`
+
+          item.children = [
+            {
+              value: item.value,
+              label: 'Overview',
+              to: item.to
+            },
+            ...children
+          ]
+          item.value = branchValue
+          delete item.to
+        } else {
+          item.children = children
+        }
       }
 
       return item

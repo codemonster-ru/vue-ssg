@@ -1,5 +1,11 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.0.4 - 2026-04-29
+
+### Patch Changes
+
+- Merge docs sidebar page nodes with matching section nodes so `foo.md` and `foo/bar.md` render as one branch with an `Overview` child instead of duplicate siblings.
+
 ## 1.0.3 - 2026-04-29
 
 ### Patch Changes
