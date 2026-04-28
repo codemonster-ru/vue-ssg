@@ -118,3 +118,86 @@ test('normalizes index markdown links to directory routes', () => {
   assert.match(paragraphBlock.html, /href="..\/guide"/)
   assert.match(paragraphBlock.html, /href="\.\/guide"/)
 })
+
+test('resolves nested index pages as section overview pages', () => {
+  const { docsPages } = resolveDocsContent({
+    docsConfig,
+    markdownFiles: {
+      '/tmp/content/packages/floater.js/latest/index.md': '# Floater latest\n\n[Overview](./index.md)',
+      '/tmp/content/packages/floater.js/latest/getting-started.md': '# Getting started',
+      '/tmp/content/packages/floater.js/latest/api/core.md': '# Core API'
+    }
+  })
+
+  const indexPage = docsPages.find((page) => page.path === '/packages/floater.js/latest')
+  assert.ok(indexPage, 'Expected latest index page to be present')
+  assert.equal(indexPage.id, 'packages-floater.js-latest-index')
+  assert.equal(indexPage.title, 'Floater latest')
+  assert.equal(indexPage.navTitle, 'Overview')
+  assert.deepEqual(indexPage.section, ['packages', 'floater.js', 'latest'])
+
+  const paragraphBlock = getFirstBlockByType(indexPage, 'paragraph')
+  assert.equal(paragraphBlock.html, '<a href=".">Overview</a>')
+})
+
+test('falls back to overview title and nav title for index pages without frontmatter or h1', () => {
+  const { docsPages } = resolveDocsContent({
+    docsConfig,
+    markdownFiles: {
+      '/tmp/content/packages/floater.js/latest/index.md': 'Install the package.'
+    }
+  })
+
+  assert.equal(docsPages.length, 1)
+  assert.equal(docsPages[0].title, 'Overview')
+  assert.equal(docsPages[0].navTitle, 'Overview')
+})
+
+test('keeps frontmatter priority for index page title and nav title', () => {
+  const { docsPages } = resolveDocsContent({
+    docsConfig,
+    markdownFiles: {
+      '/tmp/content/packages/floater.js/latest/index.md': `---
+title: Stable release
+navTitle: Start here
+---
+# Floater latest`
+    }
+  })
+
+  assert.equal(docsPages.length, 1)
+  assert.equal(docsPages[0].title, 'Stable release')
+  assert.equal(docsPages[0].navTitle, 'Start here')
+})
+
+test('builds sidebar for index pages without duplicate latest siblings', () => {
+  const { docsSidebar } = resolveDocsContent({
+    docsConfig,
+    markdownFiles: {
+      '/tmp/content/packages/floater.js/latest/index.md': '# Floater latest',
+      '/tmp/content/packages/floater.js/latest/getting-started.md': '# Getting started',
+      '/tmp/content/packages/floater.js/latest/api/core.md': '# Core API'
+    }
+  })
+
+  const packagesNode = docsSidebar.find((item) => item.value === 'packages')
+  assert.ok(packagesNode?.children, 'Expected packages section')
+
+  const packageNode = packagesNode.children.find((item) => item.value === 'packages-floater.js')
+  assert.ok(packageNode?.children, 'Expected floater.js section')
+
+  const latestNodes = packageNode.children.filter((item) => item.value === 'packages-floater.js-latest')
+  assert.equal(latestNodes.length, 1)
+
+  const latestNode = latestNodes[0]
+  assert.equal(latestNode.label, 'Latest')
+  assert.ok(latestNode.children, 'Expected latest children')
+  assert.deepEqual(
+    latestNode.children.map((item) => [item.value, item.label, item.to]),
+    [
+      ['packages-floater.js-latest-getting-started', 'Getting Started', '/packages/floater.js/latest/getting-started'],
+      ['packages-floater.js-latest-index', 'Overview', '/packages/floater.js/latest'],
+      ['packages-floater.js-latest-api', 'Api', undefined]
+    ]
+  )
+})

@@ -64,7 +64,7 @@ export function toPublicDocsPath(pathname: string): string {
   const packageKey = match[1]
   const restPath = match[2]
 
-  return restPath ? `/${packageKey}/${restPath}` : `/${packageKey}`
+  return restPath ? `/${packageKey}/${restPath}` : `/${packageKey}/`
 }
 
 function mapSidebarToPublicPaths(items: VfNavMenuItem[]): VfNavMenuItem[] {
@@ -90,7 +90,12 @@ const docsPages: DocsPage[] = resolvedDocsContent.docsPages.map((page) => ({
   path: toPublicDocsPath(page.path)
 }))
 
-const docsPagesByPath = new Map(docsPages.map((page) => [page.path, page] as const))
+const docsPagesByPath = new Map<string, DocsPage>()
+
+for (const page of docsPages) {
+  docsPagesByPath.set(page.path, page)
+  docsPagesByPath.set(normalizePath(page.path), page)
+}
 
 const docsSidebar = mapSidebarToPublicPaths(resolvedDocsContent.docsSidebar)
 
