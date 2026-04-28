@@ -45,6 +45,7 @@ export interface DocsPage {
   id: string
   path: string
   sourcePath: string
+  isIndexPage: boolean
   title: string
   navTitle: string
   description?: string
@@ -64,6 +65,7 @@ interface Frontmatter {
 interface NavNode {
   label: string
   order: number
+  value?: string
   path?: string
   children: Map<string, NavNode>
 }
@@ -147,6 +149,10 @@ function normalizeDocPath(sourcePath: string): string {
   }
 
   return `/${relativePath}`
+}
+
+function isIndexSourcePath(sourcePath: string): boolean {
+  return sourcePath.replace(/\\/g, '/').replace(/\.md$/, '').endsWith('/index')
 }
 
 function normalizeMarkdownLinkHref(href: string): string {
@@ -288,21 +294,31 @@ function renderMarkdown(markdown: string, tocLevels: Set<number>): {
   return { blocks, tableOfContents }
 }
 
+function getFirstHeadingText(markdown: string): string | undefined {
+  const tokens = marked.lexer(markdown) as TokensList
+  const heading = tokens.find((token): token is Tokens.Heading => token.type === 'heading' && token.depth === 1)
+
+  return heading?.text.trim() || undefined
+}
+
 function parsePage(sourcePath: string, source: string, tocLevels: Set<number>): DocsPage {
   const { data: frontmatter, content } = parseFrontmatter(source)
   const path = normalizeDocPath(sourcePath)
   const pathSegments = path === '/' ? [] : path.replace(/^\//, '').split('/')
-  const section = pathSegments.slice(0, -1)
+  const isIndexPage = isIndexSourcePath(sourcePath)
+  const section = isIndexPage ? pathSegments : pathSegments.slice(0, -1)
   const filename = pathSegments[pathSegments.length - 1] ?? 'index'
-  const fallbackTitle = filename === 'index' ? 'Overview' : toTitleCase(filename)
+  const fallbackTitle = isIndexPage ? (getFirstHeadingText(content) ?? 'Overview') : toTitleCase(filename)
   const title = frontmatter.title?.trim() || fallbackTitle
-  const navTitle = frontmatter.navTitle?.trim() || title
+  const navTitle = frontmatter.navTitle?.trim() || (isIndexPage ? 'Overview' : title)
   const { blocks, tableOfContents } = renderMarkdown(content, tocLevels)
+  const id = isIndexPage && path !== '/' ? `${toValueFromPath(path)}-index` : toValueFromPath(path)
 
   return {
-    id: toValueFromPath(path),
+    id,
     path,
     sourcePath,
+    isIndexPage,
     title,
     navTitle,
     description: frontmatter.description?.trim(),
@@ -338,6 +354,7 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
         current.set(segment, {
           label: sectionConfig?.label ?? toTitleCase(segment),
           order: sectionConfig?.order ?? 1_000,
+          value: toValueFromPath(currentPath),
           path: currentPath,
           children: new Map()
         })
@@ -346,18 +363,22 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
       current = current.get(segment)!.children
     }
 
-    current.set(page.id, {
+    const pageKey = page.isIndexPage ? 'index' : page.id
+    const existingPageNode = current.get(pageKey)
+
+    current.set(pageKey, {
       label: page.navTitle,
       order: page.order,
+      value: page.id,
       path: page.path,
-      children: new Map()
+      children: existingPageNode?.children ?? new Map()
     })
   }
 
   const toItems = (nodes: Map<string, NavNode>): VfNavMenuItem[] =>
     sortNodes([...nodes.values()]).map((node) => {
       const item: VfNavMenuItem = {
-        value: toValueFromPath(node.path ?? node.label),
+        value: node.value ?? toValueFromPath(node.path ?? node.label),
         label: node.label
       }
 

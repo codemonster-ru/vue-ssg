@@ -1,5 +1,12 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.4.1 - 2026-04-29
+
+### Patch Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.0.3`.
+- Preserve canonical trailing-slash package index URLs in the `docs` template sidebar, package cards, and page lookup.
+
 ## 1.4.0 - 2026-04-25
 
 ### Minor Changes

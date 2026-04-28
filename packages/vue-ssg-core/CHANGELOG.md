@@ -1,5 +1,12 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.0.3 - 2026-04-29
+
+### Patch Changes
+
+- Treat nested `index.md` files as section overview pages, using frontmatter or the first H1 for page titles and `Overview` for default nav labels.
+- Merge index pages into their sidebar section without duplicate sibling nodes while preserving child pages and directory-style markdown link normalization.
+
 ## 1.0.2 - 2026-04-28
 
 ### Patch Changes
