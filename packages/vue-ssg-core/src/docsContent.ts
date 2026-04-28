@@ -149,6 +149,57 @@ function normalizeDocPath(sourcePath: string): string {
   return `/${relativePath}`
 }
 
+function normalizeMarkdownLinkHref(href: string): string {
+  if (
+    href.startsWith('#') ||
+    href.startsWith('//') ||
+    /^[a-z][a-z\d+.-]*:/i.test(href)
+  ) {
+    return href
+  }
+
+  const match = href.match(/^([^?#]*)([?#].*)?$/)
+
+  if (!match) {
+    return href
+  }
+
+  const [, pathname, suffix = ''] = match
+
+  if (!/\.(?:md|mdx)$/i.test(pathname)) {
+    return href
+  }
+
+  const extensionlessPathname = pathname.replace(/\.(?:md|mdx)$/i, '')
+  let normalizedPathname = extensionlessPathname
+
+  if (extensionlessPathname === 'index' || extensionlessPathname === './index') {
+    normalizedPathname = '.'
+  } else if (extensionlessPathname.endsWith('/index')) {
+    normalizedPathname = extensionlessPathname.replace(/\/index$/, '')
+  }
+
+  return `${normalizedPathname}${suffix}`
+}
+
+function normalizeMarkdownLinks(tokens: TokensList): void {
+  for (const token of tokens) {
+    if (token.type === 'link' && typeof token.href === 'string') {
+      token.href = normalizeMarkdownLinkHref(token.href)
+    }
+
+    if ('tokens' in token && Array.isArray(token.tokens)) {
+      normalizeMarkdownLinks(token.tokens as TokensList)
+    }
+
+    if (token.type === 'list' && Array.isArray(token.items)) {
+      for (const item of token.items) {
+        normalizeMarkdownLinks(item.tokens as TokensList)
+      }
+    }
+  }
+}
+
 function toValueFromPath(path: string): string {
   return path === '/' ? 'index' : path.replace(/^\//, '').replace(/\//g, '-')
 }
@@ -170,6 +221,7 @@ function renderMarkdown(markdown: string, tocLevels: Set<number>): {
   tableOfContents: VfTableOfContentsItem[]
 } {
   const tokens = marked.lexer(markdown) as TokensList
+  normalizeMarkdownLinks(tokens)
   const headingSlugger = new GithubSlugger()
   const tableOfContents: VfTableOfContentsItem[] = []
   const blocks: DocsContentBlock[] = []
