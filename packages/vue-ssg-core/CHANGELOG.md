@@ -1,5 +1,11 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.0.2 - 2026-04-28
+
+### Patch Changes
+
+- Normalize internal markdown links in docs content rendering so `.md` and `.mdx` links resolve to generated SSG routes, while preserving query/hash fragments and leaving external/hash-only links unchanged.
+
 ## 1.0.1 - 2026-04-19
 ### Patch Changes
 
