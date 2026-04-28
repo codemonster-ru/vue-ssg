@@ -170,6 +170,54 @@ navTitle: Start here
   assert.equal(docsPages[0].navTitle, 'Start here')
 })
 
+function resolveMiddlewareSidebar(markdownFiles) {
+  const { docsSidebar } = resolveDocsContent({
+    docsConfig,
+    markdownFiles
+  })
+
+  const apiNode = docsSidebar.find((item) => item.value === 'api')
+  assert.ok(apiNode?.children, 'Expected api section')
+
+  const middlewareNodes = apiNode.children.filter((item) => item.label === 'Middleware')
+  assert.equal(middlewareNodes.length, 1)
+
+  return middlewareNodes[0]
+}
+
+test('merges a page and folder with the same path into one sidebar node', () => {
+  const middlewareNode = resolveMiddlewareSidebar({
+    '/tmp/content/api/middleware.md': '# Middleware',
+    '/tmp/content/api/middleware/offset.md': '# Offset',
+    '/tmp/content/api/middleware/flip.md': '# Flip'
+  })
+
+  assert.ok(middlewareNode.children, 'Expected middleware children')
+  assert.deepEqual(
+    middlewareNode.children.map((item) => [item.value, item.label, item.to]),
+    [
+      ['api-middleware', 'Overview', '/api/middleware'],
+      ['api-middleware-flip', 'Flip', '/api/middleware/flip'],
+      ['api-middleware-offset', 'Offset', '/api/middleware/offset']
+    ]
+  )
+})
+
+test('keeps sidebar output stable when folder children are processed before the page', () => {
+  const pageFirstNode = resolveMiddlewareSidebar({
+    '/tmp/content/api/middleware.md': '# Middleware',
+    '/tmp/content/api/middleware/offset.md': '# Offset',
+    '/tmp/content/api/middleware/flip.md': '# Flip'
+  })
+  const childrenFirstNode = resolveMiddlewareSidebar({
+    '/tmp/content/api/middleware/offset.md': '# Offset',
+    '/tmp/content/api/middleware/flip.md': '# Flip',
+    '/tmp/content/api/middleware.md': '# Middleware'
+  })
+
+  assert.deepEqual(childrenFirstNode, pageFirstNode)
+})
+
 test('builds sidebar for index pages without duplicate latest siblings', () => {
   const { docsSidebar } = resolveDocsContent({
     docsConfig,
