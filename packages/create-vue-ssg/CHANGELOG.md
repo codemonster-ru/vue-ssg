@@ -1,5 +1,12 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.4.2 - 2026-04-29
+
+### Patch Changes
+
+- Update generated docs templates to render structured markdown table blocks with `VfTable`, including inline cell content and column alignment.
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.0.5`.
+
 ## 1.4.1 - 2026-04-29
 
 ### Patch Changes
