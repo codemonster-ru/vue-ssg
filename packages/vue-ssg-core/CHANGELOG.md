@@ -1,5 +1,11 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.0.5 - 2026-04-29
+
+### Patch Changes
+
+- Render markdown tables as structured `table` docs content blocks with inline cell HTML and normalized column alignment instead of falling back to raw HTML.
+
 ## 1.0.4 - 2026-04-29
 
 ### Patch Changes

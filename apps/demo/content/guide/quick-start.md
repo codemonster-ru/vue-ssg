@@ -30,3 +30,14 @@ starts from system preferences and remembers user selection.
 
 Build the site shell with `VfDocumentLayout`, then feed it sidebar items,
 current page HTML and a table of contents generated from markdown headings.
+
+## Markdown Blocks
+
+The docs renderer keeps common markdown structures as typed content blocks so
+the Vue layer can use VueForge components where they fit.
+
+| Block | Renderer | Notes |
+| :--- | :------: | ----: |
+| `table` | `VfTable` | structured |
+| `code` | `CodeBlock` | highlighted |
+| `blockquote` | native | prose |

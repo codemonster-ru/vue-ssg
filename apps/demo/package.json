@@ -13,7 +13,7 @@
     "check": "npm run lint && npm run typecheck && npm run build"
   },
   "dependencies": {
-    "@codemonster-ru/vue-ssg-core": "^1.0.3",
+    "@codemonster-ru/vue-ssg-core": "^1.0.5",
     "@codemonster-ru/vue-codeblock": "^1.1.1",
     "@codemonster-ru/vueforge-core": "^1.17.2",
     "@codemonster-ru/vueforge-layouts": "^1.10.0",
