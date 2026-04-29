@@ -11,6 +11,8 @@ import type {
   DocsSiteConfig
 } from './config'
 
+export type DocsTableAlign = 'left' | 'center' | 'right' | null
+
 export type DocsContentBlock =
   | {
       type: 'heading'
@@ -35,6 +37,12 @@ export type DocsContentBlock =
   | {
       type: 'blockquote'
       html: string
+    }
+  | {
+      type: 'table'
+      header: string[]
+      rows: string[][]
+      align: DocsTableAlign[]
     }
   | {
       type: 'html'
@@ -223,6 +231,16 @@ function renderListItemTokens(tokens: TokensList | undefined): string {
   return Parser.parse(tokens ?? [])
 }
 
+function normalizeTableAlign(align: Array<string | null | undefined>): DocsTableAlign[] {
+  return align.map((value) => {
+    if (value === 'left' || value === 'center' || value === 'right') {
+      return value
+    }
+
+    return null
+  })
+}
+
 function renderMarkdown(markdown: string, tocLevels: Set<number>): {
   blocks: DocsContentBlock[]
   tableOfContents: VfTableOfContentsItem[]
@@ -281,6 +299,14 @@ function renderMarkdown(markdown: string, tocLevels: Set<number>): {
         blocks.push({
           type: 'blockquote',
           html: renderBlockTokens(token.tokens)
+        })
+        break
+      case 'table':
+        blocks.push({
+          type: 'table',
+          header: token.header.map((cell: Tokens.TableCell) => renderInline(cell.tokens)),
+          rows: token.rows.map((row: Tokens.TableCell[]) => row.map((cell) => renderInline(cell.tokens))),
+          align: normalizeTableAlign(token.align)
         })
         break
       default:

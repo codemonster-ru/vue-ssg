@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAttrs } from 'vue'
 import { CodeBlock } from '@codemonster-ru/vue-codeblock'
+import { VfTable } from '@codemonster-ru/vueforge-core'
 import type { DocsContentBlock } from '@/content/docs'
 
 defineProps<{
@@ -31,6 +32,32 @@ const attrs = useAttrs()
         :language="block.language"
         theme="inherit"
       />
+
+      <VfTable v-else-if="block.type === 'table'" striped>
+        <template #header>
+          <tr>
+            <!-- eslint-disable vue/no-v-html -->
+            <th
+              v-for="(cell, cellIndex) in block.header"
+              :key="cellIndex"
+              :style="{ textAlign: block.align[cellIndex] ?? undefined }"
+              v-html="cell"
+            />
+            <!-- eslint-enable vue/no-v-html -->
+          </tr>
+        </template>
+
+        <tr v-for="(row, rowIndex) in block.rows" :key="rowIndex">
+          <!-- eslint-disable vue/no-v-html -->
+          <td
+            v-for="(cell, cellIndex) in row"
+            :key="cellIndex"
+            :style="{ textAlign: block.align[cellIndex] ?? undefined }"
+            v-html="cell"
+          />
+          <!-- eslint-enable vue/no-v-html -->
+        </tr>
+      </VfTable>
 
       <ol v-else-if="block.type === 'list' && block.ordered">
         <!-- eslint-disable vue/no-v-html -->

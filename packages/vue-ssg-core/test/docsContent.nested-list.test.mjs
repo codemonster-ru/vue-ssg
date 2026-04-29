@@ -78,6 +78,27 @@ test('normalizes inline markdown links in blockquotes', () => {
   assert.equal(blockquoteBlock.html, '<p><a href="./api/core">Core API</a></p>\n')
 })
 
+test('renders markdown tables as structured table blocks', () => {
+  const page = resolveSinglePage(`| Name | Type |
+| ---- | ---- |
+| \`x\`  | \`number\` |`)
+  const tableBlock = getFirstBlockByType(page, 'table')
+
+  assert.equal(page.blocks.filter((block) => block.type === 'html').length, 0)
+  assert.deepEqual(tableBlock.header, ['Name', 'Type'])
+  assert.deepEqual(tableBlock.rows, [['<code>x</code>', '<code>number</code>']])
+  assert.deepEqual(tableBlock.align, [null, null])
+})
+
+test('normalizes markdown table alignment', () => {
+  const page = resolveSinglePage(`| Left | Center | Right |
+| :--- | :----: | ----: |
+| a    | b      | c     |`)
+  const tableBlock = getFirstBlockByType(page, 'table')
+
+  assert.deepEqual(tableBlock.align, ['left', 'center', 'right'])
+})
+
 test('leaves external markdown links unchanged', () => {
   const page = resolveSinglePage(
     `[HTTPS](https://example.com/readme.md) [HTTP](http://example.com/readme.md) [Mail](mailto:test@example.com) [Tel](tel:+123) [CDN](//example.com/readme.md)`
