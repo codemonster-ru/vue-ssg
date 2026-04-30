@@ -76,6 +76,7 @@ interface NavNode {
   value?: string
   path?: string
   isPage?: boolean
+  isIndexPage?: boolean
   children: Map<string, NavNode>
 }
 
@@ -362,6 +363,13 @@ function sortNodes(nodes: NavNode[]): NavNode[] {
       return left.order - right.order
     }
 
+    const leftIndexPriority = left.isIndexPage ? 0 : 1
+    const rightIndexPriority = right.isIndexPage ? 0 : 1
+
+    if (leftIndexPriority !== rightIndexPriority) {
+      return leftIndexPriority - rightIndexPriority
+    }
+
     return left.label.localeCompare(right.label)
   })
 }
@@ -408,6 +416,7 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
       value: page.id,
       path: page.path,
       isPage: true,
+      isIndexPage: page.isIndexPage,
       children: existingPageNode?.children ?? new Map()
     })
   }
