@@ -1,5 +1,11 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.0.6 - 2026-04-30
+
+### Patch Changes
+
+- Update `@codemonster-ru/vueforge-core` dependency to `^1.17.4`.
+
 ## 1.0.5 - 2026-04-29
 
 ### Patch Changes
