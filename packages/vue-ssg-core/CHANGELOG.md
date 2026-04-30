@@ -1,5 +1,11 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.0.7 - 2026-05-01
+
+### Patch Changes
+
+- Prioritize `index.md` sidebar pages over sibling pages when `order` is equal, while still keeping `order` as the primary sort key and label sorting as fallback.
+
 ## 1.0.6 - 2026-04-30
 
 ### Patch Changes

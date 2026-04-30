@@ -264,9 +264,67 @@ test('builds sidebar for index pages without duplicate latest siblings', () => {
   assert.deepEqual(
     latestNode.children.map((item) => [item.value, item.label, item.to]),
     [
-      ['packages-floater.js-latest-getting-started', 'Getting Started', '/packages/floater.js/latest/getting-started'],
       ['packages-floater.js-latest-index', 'Overview', '/packages/floater.js/latest'],
+      ['packages-floater.js-latest-getting-started', 'Getting Started', '/packages/floater.js/latest/getting-started'],
       ['packages-floater.js-latest-api', 'Api', undefined]
     ]
   )
+})
+
+test('keeps order priority over index priority in sidebar sorting', () => {
+  const { docsSidebar } = resolveDocsContent({
+    docsConfig,
+    markdownFiles: {
+      '/tmp/content/pkg/latest/index.md': `---
+order: 10
+---
+# Package Overview`,
+      '/tmp/content/pkg/latest/getting-started.md': `---
+order: 0
+---
+# Getting Started`
+    }
+  })
+
+  const pkgNode = docsSidebar.find((item) => item.value === 'pkg')
+  assert.ok(pkgNode?.children, 'Expected pkg section')
+  const latestNode = pkgNode.children.find((item) => item.value === 'pkg-latest')
+  assert.ok(latestNode?.children, 'Expected latest section')
+
+  assert.deepEqual(
+    latestNode.children.map((item) => item.label),
+    ['Getting Started', 'Overview']
+  )
+})
+
+test('sorts non-index siblings by label when order is equal', () => {
+  const { docsSidebar } = resolveDocsContent({
+    docsConfig,
+    markdownFiles: {
+      '/tmp/content/pkg/latest/api.md': '# Api',
+      '/tmp/content/pkg/latest/guides.md': '# Guides'
+    }
+  })
+
+  const pkgNode = docsSidebar.find((item) => item.value === 'pkg')
+  assert.ok(pkgNode?.children, 'Expected pkg section')
+  const latestNode = pkgNode.children.find((item) => item.value === 'pkg-latest')
+  assert.ok(latestNode?.children, 'Expected latest section')
+
+  assert.deepEqual(
+    latestNode.children.map((item) => item.label),
+    ['Api', 'Guides']
+  )
+})
+
+test('keeps branch overview inserted first inside page branches with children', () => {
+  const middlewareNode = resolveMiddlewareSidebar({
+    '/tmp/content/api/middleware.md': '# Middleware',
+    '/tmp/content/api/middleware/offset.md': '# Offset',
+    '/tmp/content/api/middleware/flip.md': '# Flip'
+  })
+
+  assert.ok(middlewareNode.children, 'Expected middleware children')
+  assert.equal(middlewareNode.children[0].label, 'Overview')
+  assert.equal(middlewareNode.children[0].to, '/api/middleware')
 })
