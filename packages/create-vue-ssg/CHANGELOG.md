@@ -1,5 +1,12 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.4.3 - 2026-04-30
+
+### Patch Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.0.6`.
+- Update generated docs template to depend on `@codemonster-ru/vue-codeblock@^2.0.0` and `@codemonster-ru/vueforge-core@^1.17.4`.
+
 ## 1.4.2 - 2026-04-29
 
 ### Patch Changes
