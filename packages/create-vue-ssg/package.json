@@ -1,6 +1,6 @@
 {
   "name": "@codemonster-ru/create-vue-ssg",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Scaffold a Codemonster SSG project.",
   "keywords": [
     "create",
