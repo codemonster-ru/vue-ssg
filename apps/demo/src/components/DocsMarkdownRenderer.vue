@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useAttrs } from 'vue'
 import { CodeBlock } from '@codemonster-ru/vue-codeblock'
+import { VfPlayground } from '@codemonster-ru/vueforge-playground'
 import { VfTable } from '@codemonster-ru/vueforge-core'
 import type { DocsContentBlock } from '@/content/docs'
 
@@ -30,6 +31,16 @@ const attrs = useAttrs()
         v-else-if="block.type === 'code'"
         :code="block.code"
         :language="block.language"
+        theme="inherit"
+      />
+      <VfPlayground
+        v-else-if="block.type === 'playground'"
+        :files="block.files"
+        :entry="block.entry"
+        :framework="block.framework"
+        :autorun="block.autorun"
+        :show-code="block.showCode"
+        :height="block.height"
         theme="inherit"
       />
 

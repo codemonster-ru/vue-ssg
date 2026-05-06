@@ -1,5 +1,13 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.5.0 - 2026-05-06
+
+### Minor Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.1.0`.
+- Add markdown playground rendering support to the generated `docs` template using `@codemonster-ru/vueforge-playground`.
+- Add release-time template sync so duplicated docs files are copied from `apps/demo` before packaging.
+
 ## 1.4.4 - 2026-05-01
 
 ### Patch Changes

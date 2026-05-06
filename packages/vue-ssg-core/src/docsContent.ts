@@ -12,6 +12,7 @@ import type {
 } from './config'
 
 export type DocsTableAlign = 'left' | 'center' | 'right' | null
+export type DocsPlaygroundFramework = 'vanilla' | 'vue' | 'html'
 
 export type DocsContentBlock =
   | {
@@ -28,6 +29,15 @@ export type DocsContentBlock =
       type: 'code'
       code: string
       language: string
+    }
+  | {
+      type: 'playground'
+      files: Record<string, string>
+      entry: string
+      framework?: DocsPlaygroundFramework
+      autorun?: boolean
+      showCode?: boolean
+      height?: number | string
     }
   | {
       type: 'list'
@@ -242,6 +252,93 @@ function normalizeTableAlign(align: Array<string | null | undefined>): DocsTable
   })
 }
 
+interface PlaygroundPayload {
+  files: Record<string, string>
+  entry?: string
+  framework?: DocsPlaygroundFramework
+  autorun?: boolean
+  showCode?: boolean
+  height?: number | string
+}
+
+function isStringRecord(value: unknown): value is Record<string, string> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return false
+  }
+
+  return Object.values(value).every((entry) => typeof entry === 'string')
+}
+
+function parsePlaygroundPayload(rawSource: string): PlaygroundPayload | null {
+  let parsed: unknown
+
+  try {
+    parsed = JSON.parse(rawSource)
+  } catch {
+    return null
+  }
+
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return null
+  }
+
+  const data = parsed as {
+    files?: unknown
+    entry?: unknown
+    framework?: unknown
+    autorun?: unknown
+    showCode?: unknown
+    height?: unknown
+  }
+
+  const files = isStringRecord(data.files) ? data.files : null
+
+  if (!files || Object.keys(files).length === 0) {
+    return null
+  }
+
+  return {
+    files,
+    entry: typeof data.entry === 'string' ? data.entry : undefined,
+    framework:
+      data.framework === 'vanilla' || data.framework === 'vue' || data.framework === 'html'
+        ? data.framework
+        : undefined,
+    autorun: typeof data.autorun === 'boolean' ? data.autorun : undefined,
+    showCode: typeof data.showCode === 'boolean' ? data.showCode : undefined,
+    height:
+      typeof data.height === 'number' || typeof data.height === 'string' ? data.height : undefined
+  }
+}
+
+function parsePlaygroundCodeBlock(token: Tokens.Code): DocsContentBlock | null {
+  const language = token.lang?.trim().toLowerCase()
+
+  if (language !== 'playground' && language !== 'vf-playground') {
+    return null
+  }
+
+  const payload = parsePlaygroundPayload(token.text)
+
+  if (!payload) {
+    return null
+  }
+
+  const entry = payload.entry && payload.files[payload.entry]
+    ? payload.entry
+    : Object.keys(payload.files)[0]
+
+  return {
+    type: 'playground',
+    files: payload.files,
+    entry,
+    framework: payload.framework,
+    autorun: payload.autorun,
+    showCode: payload.showCode,
+    height: payload.height
+  }
+}
+
 function renderMarkdown(markdown: string, tocLevels: Set<number>): {
   blocks: DocsContentBlock[]
   tableOfContents: VfTableOfContentsItem[]
@@ -283,6 +380,14 @@ function renderMarkdown(markdown: string, tocLevels: Set<number>): {
         })
         break
       case 'code':
+        {
+          const playgroundBlock = parsePlaygroundCodeBlock(token as Tokens.Code)
+
+          if (playgroundBlock) {
+            blocks.push(playgroundBlock)
+            break
+          }
+        }
         blocks.push({
           type: 'code',
           code: token.text,

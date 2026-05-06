@@ -1,8 +1,8 @@
 import docsConfig from '../../ssg.config'
 import {
   resolveDocsContent,
-  type DocsContentBlock,
-  type DocsPage
+  type DocsContentBlock as CoreDocsContentBlock,
+  type DocsPage as CoreDocsPage
 } from '@codemonster-ru/vue-ssg-core'
 import type { VfNavMenuItem } from '@codemonster-ru/vueforge-core'
 
@@ -27,6 +27,19 @@ const resolvedDocsContent = resolveDocsContent({
   docsConfig,
   markdownFiles
 })
+
+type DocsPlaygroundBlock = {
+  type: 'playground'
+  files: Record<string, string>
+  entry: string
+  framework?: 'vanilla' | 'vue' | 'html'
+  autorun?: boolean
+  showCode?: boolean
+  height?: number | string
+}
+
+type DocsContentBlock = CoreDocsContentBlock | DocsPlaygroundBlock
+type DocsPage = Omit<CoreDocsPage, 'blocks'> & { blocks: DocsContentBlock[] }
 
 export interface DocsPackage {
   packageName: string

@@ -26,7 +26,8 @@
     "typecheck:packages": "npm run -w @codemonster-ru/vue-ssg-core typecheck && npm run -w @codemonster-ru/create-vue-ssg typecheck",
     "pack:core": "npm pack --dry-run --workspace @codemonster-ru/vue-ssg-core",
     "pack:create-vue-ssg": "npm pack --dry-run --workspace @codemonster-ru/create-vue-ssg",
-    "release:check": "npm run typecheck:packages && npm run build:packages && npm run pack:core && npm run pack:create-vue-ssg",
+    "sync:docs-template": "node scripts/sync-docs-template.mjs",
+    "release:check": "npm run sync:docs-template && npm run typecheck:packages && npm run build:packages && npm run pack:core && npm run pack:create-vue-ssg",
     "changelog:date": "node scripts/add-changelog-dates.mjs"
   },
   "devDependencies": {
