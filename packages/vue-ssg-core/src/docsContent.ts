@@ -261,6 +261,129 @@ interface PlaygroundPayload {
   height?: number | string
 }
 
+interface PlaygroundSrcPayload {
+  files: Record<string, string>
+  entry: string
+  framework?: DocsPlaygroundFramework
+  height?: number
+}
+
+function parsePlaygroundSourceHeader(text: string, sourcePath: string): {
+  framework?: DocsPlaygroundFramework
+  height?: number
+  entry: string
+} {
+  const lines = text
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+  const metadata = new Map<string, string>()
+
+  for (const line of lines) {
+    const separatorIndex = line.indexOf(':')
+
+    if (separatorIndex === -1) {
+      throw new Error(`[docs] Invalid playground-src in ${sourcePath}: expected "key: value", got "${line}"`)
+    }
+
+    const key = line.slice(0, separatorIndex).trim()
+    const value = line.slice(separatorIndex + 1).trim()
+
+    metadata.set(key, value)
+  }
+
+  const frameworkRaw = metadata.get('framework')
+  const framework = frameworkRaw || 'vanilla'
+  const heightRaw = metadata.get('height')
+  const entry = metadata.get('entry')
+
+  if (!entry) {
+    throw new Error(`[docs] Invalid playground-src in ${sourcePath}: "entry" is required`)
+  }
+
+  if (framework !== 'vanilla' && framework !== 'vue' && framework !== 'html') {
+    throw new Error(`[docs] Invalid playground-src in ${sourcePath}: unsupported framework "${framework}"`)
+  }
+
+  let height: number | undefined
+
+  if (heightRaw !== undefined) {
+    height = Number(heightRaw)
+
+    if (!Number.isFinite(height)) {
+      throw new Error(`[docs] Invalid playground-src in ${sourcePath}: "height" must be a number`)
+    }
+  }
+
+  return {
+    framework,
+    entry,
+    height
+  }
+}
+
+function parsePlaygroundSourcePayload(rawSource: string, sourcePath: string): PlaygroundSrcPayload {
+  const nestedTokens = marked.lexer(rawSource) as TokensList
+  let metadataToken: Tokens.Paragraph | null = null
+  const codeTokens: Tokens.Code[] = []
+
+  for (const token of nestedTokens) {
+    if (token.type === 'space') {
+      continue
+    }
+
+    if (!metadataToken) {
+      if (token.type !== 'paragraph') {
+        throw new Error(`[docs] Invalid playground-src in ${sourcePath}: header metadata must be the first block`)
+      }
+
+      metadataToken = token as Tokens.Paragraph
+      continue
+    }
+
+    if (token.type !== 'code') {
+      throw new Error(`[docs] Invalid playground-src in ${sourcePath}: only code fences are allowed after header`)
+    }
+
+    codeTokens.push(token as Tokens.Code)
+  }
+
+  if (!metadataToken) {
+    throw new Error(`[docs] Invalid playground-src in ${sourcePath}: missing header metadata`)
+  }
+
+  const { framework, height, entry } = parsePlaygroundSourceHeader(metadataToken.text, sourcePath)
+  const files: Record<string, string> = {}
+
+  for (const codeToken of codeTokens) {
+    const lang = codeToken.lang?.trim() ?? ''
+    const fileMatch = lang.match(/(?:^|\s)file=([^\s]+)/)
+
+    if (!fileMatch?.[1]) {
+      throw new Error(`[docs] Invalid playground-src in ${sourcePath}: each code fence must define "file=/path"`)
+    }
+
+    const filePath = fileMatch[1]
+    const content = codeToken.text.endsWith('\n') ? codeToken.text : `${codeToken.text}\n`
+    files[filePath] = content
+  }
+
+  if (Object.keys(files).length === 0) {
+    throw new Error(`[docs] Invalid playground-src in ${sourcePath}: at least one file fence is required`)
+  }
+
+  if (!files[entry]) {
+    throw new Error(`[docs] Invalid playground-src in ${sourcePath}: entry "${entry}" is not present in files`)
+  }
+
+  return {
+    files,
+    entry,
+    framework,
+    height
+  }
+}
+
 function isStringRecord(value: unknown): value is Record<string, string> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return false
@@ -339,7 +462,25 @@ function parsePlaygroundCodeBlock(token: Tokens.Code): DocsContentBlock | null {
   }
 }
 
-function renderMarkdown(markdown: string, tocLevels: Set<number>): {
+function parsePlaygroundSourceCodeBlock(token: Tokens.Code, sourcePath: string): DocsContentBlock | null {
+  const language = token.lang?.trim().toLowerCase()
+
+  if (language !== 'playground-src' && language !== 'vf-playground-src') {
+    return null
+  }
+
+  const payload = parsePlaygroundSourcePayload(token.text, sourcePath)
+
+  return {
+    type: 'playground',
+    files: payload.files,
+    entry: payload.entry,
+    framework: payload.framework,
+    height: payload.height
+  }
+}
+
+function renderMarkdown(markdown: string, tocLevels: Set<number>, sourcePath: string): {
   blocks: DocsContentBlock[]
   tableOfContents: VfTableOfContentsItem[]
 } {
@@ -381,6 +522,13 @@ function renderMarkdown(markdown: string, tocLevels: Set<number>): {
         break
       case 'code':
         {
+          const playgroundSourceBlock = parsePlaygroundSourceCodeBlock(token as Tokens.Code, sourcePath)
+
+          if (playgroundSourceBlock) {
+            blocks.push(playgroundSourceBlock)
+            break
+          }
+
           const playgroundBlock = parsePlaygroundCodeBlock(token as Tokens.Code)
 
           if (playgroundBlock) {
@@ -444,7 +592,7 @@ function parsePage(sourcePath: string, source: string, tocLevels: Set<number>): 
   const fallbackTitle = isIndexPage ? (getFirstHeadingText(content) ?? 'Overview') : toTitleCase(filename)
   const title = frontmatter.title?.trim() || fallbackTitle
   const navTitle = frontmatter.navTitle?.trim() || (isIndexPage ? 'Overview' : title)
-  const { blocks, tableOfContents } = renderMarkdown(content, tocLevels)
+  const { blocks, tableOfContents } = renderMarkdown(content, tocLevels, sourcePath)
   const id = isIndexPage && path !== '/' ? `${toValueFromPath(path)}-index` : toValueFromPath(path)
 
   return {
