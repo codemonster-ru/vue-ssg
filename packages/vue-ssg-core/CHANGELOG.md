@@ -1,5 +1,13 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.2.0 - 2026-05-07
+
+### Minor Changes
+
+- Add `playground-src` markdown block transformation at docs render time: parse human-readable header metadata (`framework`, `height`, required `entry`) and nested `file=/...` code fences into the existing `playground` payload shape.
+- Keep source markdown files unchanged on disk while supporting both dev and build flows through in-memory transformation.
+- Add strict validation and actionable build-time errors with source file path for invalid `playground-src` blocks.
+
 ## 1.1.0 - 2026-05-06
 
 ### Minor Changes
