@@ -1,5 +1,11 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.5.1 - 2026-05-07
+
+### Patch Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.2.0`.
+
 ## 1.5.0 - 2026-05-06
 
 ### Minor Changes

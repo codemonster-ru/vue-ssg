@@ -1,6 +1,6 @@
 {
   "name": "@codemonster-ru/vue-ssg-core",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Core APIs for Codemonster SSG apps.",
   "keywords": [
     "vue",

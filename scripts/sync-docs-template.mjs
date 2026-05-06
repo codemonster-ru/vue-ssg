@@ -11,6 +11,10 @@ const filesToSync = [
   {
     from: 'apps/demo/src/main.ts',
     to: 'packages/create-vue-ssg/templates/docs/src/main.ts'
+  },
+  {
+    from: 'apps/demo/vite.config.ts',
+    to: 'packages/create-vue-ssg/templates/docs/vite.config.ts'
   }
 ]
 
