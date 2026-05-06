@@ -10,6 +10,8 @@ export default defineConfig({
       '@codemonster-ru/vueforge-core',
       '@codemonster-ru/vueforge-layouts',
       '@codemonster-ru/vueforge-theme',
+      '@codemonster-ru/vueforge-playground',
+      '@codemonster-ru/vueforge-icons',
       '@codemonster-ru/vueiconify'
     ]
   },
