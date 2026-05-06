@@ -40,4 +40,20 @@ the Vue layer can use VueForge components where they fit.
 | :--- | :------: | ----: |
 | `table` | `VfTable` | structured |
 | `code` | `CodeBlock` | highlighted |
+| `playground` | `VfPlayground` | interactive |
 | `blockquote` | native | prose |
+
+## Playground Block
+
+Use a fenced block with language `playground` (JSON payload):
+
+```playground
+{
+  "entry": "/main.js",
+  "framework": "vanilla",
+  "height": 360,
+  "files": {
+    "/main.js": "document.body.innerHTML = '<h1>Hello Playground</h1>';"
+  }
+}
+```

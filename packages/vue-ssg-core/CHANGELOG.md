@@ -1,5 +1,12 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.1.0 - 2026-05-06
+
+### Minor Changes
+
+- Add markdown playground block support via fenced code blocks with `playground`/`vf-playground` language and JSON payload (`files`, `entry`, optional `framework`, `autorun`, `showCode`, `height`).
+- Extend `DocsContentBlock` with a typed `playground` variant to render interactive playground content in docs.
+
 ## 1.0.7 - 2026-05-01
 
 ### Patch Changes
