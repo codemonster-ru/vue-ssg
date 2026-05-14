@@ -1,5 +1,12 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.5.3 - 2026-05-15
+
+### Patch Changes
+
+- Include the generated markdown playground registry in the docs template so fresh scaffolded docs apps can typecheck before the first generator run.
+- Add a docs template type shim for `@codemonster-ru/vueforge-codeblock` to keep generated projects type-safe with the current package declarations.
+
 ## 1.5.2 - 2026-05-15
 
 ### Patch Changes
