@@ -10,6 +10,12 @@ defineProps<{
 }>()
 
 const attrs = useAttrs()
+
+function hasSandboxPlaygroundFiles(
+  block: Extract<DocsContentBlock, { type: 'playground' }>
+): block is Extract<DocsContentBlock, { type: 'playground' }> & { files: Record<string, string>, entry: string } {
+  return Boolean(block.files && block.entry)
+}
 </script>
 
 <template>
@@ -34,7 +40,7 @@ const attrs = useAttrs()
         theme="inherit"
       />
       <VfPlayground
-        v-else-if="block.type === 'playground'"
+        v-else-if="block.type === 'playground' && hasSandboxPlaygroundFiles(block)"
         :files="block.files"
         :entry="block.entry"
         :framework="block.framework"
@@ -89,7 +95,7 @@ const attrs = useAttrs()
       </blockquote>
 
       <!-- eslint-disable vue/no-v-html -->
-      <div v-else v-html="block.html" />
+      <div v-else-if="block.type === 'html'" v-html="block.html" />
       <!-- eslint-enable vue/no-v-html -->
     </template>
   </article>
