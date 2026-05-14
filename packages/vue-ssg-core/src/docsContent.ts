@@ -32,12 +32,15 @@ export type DocsContentBlock =
     }
   | {
       type: 'playground'
-      files: Record<string, string>
-      entry: string
+      files?: Record<string, string>
+      entry?: string
       framework?: DocsPlaygroundFramework
       autorun?: boolean
       showCode?: boolean
       height?: number | string
+      demoId?: string
+      demoImport?: string
+      renderMode?: 'sandbox' | 'vue-module' | 'component'
     }
   | {
       type: 'list'
@@ -253,12 +256,14 @@ function normalizeTableAlign(align: Array<string | null | undefined>): DocsTable
 }
 
 interface PlaygroundPayload {
-  files: Record<string, string>
+  files?: Record<string, string>
   entry?: string
   framework?: DocsPlaygroundFramework
   autorun?: boolean
   showCode?: boolean
   height?: number | string
+  demoId?: string
+  demoImport?: string
 }
 
 interface PlaygroundSrcPayload {
@@ -266,12 +271,14 @@ interface PlaygroundSrcPayload {
   entry: string
   framework?: DocsPlaygroundFramework
   height?: number
+  renderMode?: 'sandbox' | 'component'
 }
 
 function parsePlaygroundSourceHeader(text: string, sourcePath: string): {
   framework?: DocsPlaygroundFramework
   height?: number
   entry: string
+  renderMode: 'sandbox' | 'component'
 } {
   const lines = text
     .split('\n')
@@ -296,6 +303,8 @@ function parsePlaygroundSourceHeader(text: string, sourcePath: string): {
   const framework = frameworkRaw || 'vanilla'
   const heightRaw = metadata.get('height')
   const entry = metadata.get('entry')
+  const modeRaw = metadata.get('mode')
+  const renderMode = modeRaw === 'component' ? 'component' : 'sandbox'
 
   if (!entry) {
     throw new Error(`[docs] Invalid playground-src in ${sourcePath}: "entry" is required`)
@@ -318,7 +327,8 @@ function parsePlaygroundSourceHeader(text: string, sourcePath: string): {
   return {
     framework,
     entry,
-    height
+    height,
+    renderMode
   }
 }
 
@@ -352,7 +362,7 @@ function parsePlaygroundSourcePayload(rawSource: string, sourcePath: string): Pl
     throw new Error(`[docs] Invalid playground-src in ${sourcePath}: missing header metadata`)
   }
 
-  const { framework, height, entry } = parsePlaygroundSourceHeader(metadataToken.text, sourcePath)
+  const { framework, height, entry, renderMode } = parsePlaygroundSourceHeader(metadataToken.text, sourcePath)
   const files: Record<string, string> = {}
 
   for (const codeToken of codeTokens) {
@@ -380,7 +390,8 @@ function parsePlaygroundSourcePayload(rawSource: string, sourcePath: string): Pl
     files,
     entry,
     framework,
-    height
+    height,
+    renderMode
   }
 }
 
@@ -412,11 +423,19 @@ function parsePlaygroundPayload(rawSource: string): PlaygroundPayload | null {
     autorun?: unknown
     showCode?: unknown
     height?: unknown
+    demoId?: unknown
+    demoImport?: unknown
   }
 
-  const files = isStringRecord(data.files) ? data.files : null
+  const files = isStringRecord(data.files) ? data.files : undefined
+  const demoId = typeof data.demoId === 'string' && data.demoId.trim()
+    ? data.demoId.trim()
+    : undefined
+  const demoImport = typeof data.demoImport === 'string' && data.demoImport.trim()
+    ? data.demoImport.trim()
+    : undefined
 
-  if (!files || Object.keys(files).length === 0) {
+  if ((!files || Object.keys(files).length === 0) && !demoId && !demoImport) {
     return null
   }
 
@@ -430,7 +449,9 @@ function parsePlaygroundPayload(rawSource: string): PlaygroundPayload | null {
     autorun: typeof data.autorun === 'boolean' ? data.autorun : undefined,
     showCode: typeof data.showCode === 'boolean' ? data.showCode : undefined,
     height:
-      typeof data.height === 'number' || typeof data.height === 'string' ? data.height : undefined
+      typeof data.height === 'number' || typeof data.height === 'string' ? data.height : undefined,
+    demoId,
+    demoImport
   }
 }
 
@@ -447,6 +468,23 @@ function parsePlaygroundCodeBlock(token: Tokens.Code): DocsContentBlock | null {
     return null
   }
 
+  if (payload.demoId || payload.demoImport) {
+    return {
+      type: 'playground',
+      framework: payload.framework ?? 'vue',
+      autorun: payload.autorun,
+      showCode: payload.showCode,
+      height: payload.height,
+      demoId: payload.demoId,
+      demoImport: payload.demoImport,
+      renderMode: 'vue-module'
+    }
+  }
+
+  if (!payload.files || Object.keys(payload.files).length === 0) {
+    return null
+  }
+
   const entry = payload.entry && payload.files[payload.entry]
     ? payload.entry
     : Object.keys(payload.files)[0]
@@ -458,7 +496,8 @@ function parsePlaygroundCodeBlock(token: Tokens.Code): DocsContentBlock | null {
     framework: payload.framework,
     autorun: payload.autorun,
     showCode: payload.showCode,
-    height: payload.height
+    height: payload.height,
+    renderMode: 'sandbox'
   }
 }
 
@@ -476,7 +515,8 @@ function parsePlaygroundSourceCodeBlock(token: Tokens.Code, sourcePath: string):
     files: payload.files,
     entry: payload.entry,
     framework: payload.framework,
-    height: payload.height
+    height: payload.height,
+    renderMode: payload.renderMode ?? 'sandbox'
   }
 }
 
