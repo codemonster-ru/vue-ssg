@@ -1,5 +1,5 @@
 import VueForgeLayouts from '@codemonster-ru/vueforge-layouts'
-import '@codemonster-ru/vue-codeblock/style.css'
+import '@codemonster-ru/vueforge-codeblock/style.css'
 import '@codemonster-ru/vueforge-core/styles.css'
 import '@codemonster-ru/vueforge-layouts/styles.css'
 import '@codemonster-ru/vueforge-playground/style.css'
