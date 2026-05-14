@@ -1,5 +1,13 @@
 # @codemonster-ru/create-vue-ssg
 
+## 1.5.2 - 2026-05-15
+
+### Patch Changes
+
+- Update generated docs templates to depend on `@codemonster-ru/vue-ssg-core@^1.3.0` and current VueForge packages.
+- Add markdown component playground generation to the docs template, including the generated registry placeholder and Vite plugin wiring.
+- Keep docs template rendering aligned with the demo app for component-mode playground blocks.
+
 ## 1.5.1 - 2026-05-07
 
 ### Patch Changes
