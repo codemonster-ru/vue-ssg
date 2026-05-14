@@ -1,5 +1,13 @@
 # @codemonster-ru/vue-ssg-core
 
+## 1.3.0 - 2026-05-15
+
+### Minor Changes
+
+- Add a `./playground` export with helpers for scanning markdown `playground-src` component demos, generating virtual component registries, and wiring the matching Vite plugin.
+- Extend playground docs content blocks with `renderMode`, optional `demoId` and optional `demoImport` so docs renderers can distinguish sandbox, component, and Vue module playgrounds.
+- Include `src/playground.ts` in the package build output and add regression coverage for component and Vue module playground parsing.
+
 ## 1.2.0 - 2026-05-07
 
 ### Minor Changes
