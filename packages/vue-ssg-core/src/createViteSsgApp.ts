@@ -250,6 +250,10 @@ function hasHydratableRoot(rootContainer: string): boolean {
   return Boolean(root && root.innerHTML.trim().length > 0)
 }
 
+function isSsrRuntime(): boolean {
+  return typeof window === 'undefined'
+}
+
 export function createViteSsgApp(
   App: Component,
   routerOptions: { base?: string; routes: RouteRecordRaw[] },
@@ -264,17 +268,18 @@ export function createViteSsgApp(
   } = options ?? {}
 
   async function createSsgApp(routePath?: string): Promise<CreateViteSsgContext> {
-    const shouldHydrate = import.meta.env.SSR || (hydration && hasHydratableRoot(rootContainer))
+    const isSsr = isSsrRuntime()
+    const shouldHydrate = isSsr || (hydration && hasHydratableRoot(rootContainer))
     const app = shouldHydrate ? createSSRApp(App) : createApp(App)
     let head: CreateViteSsgContext['head']
 
     if (useHead) {
-      head = import.meta.env.SSR ? createServerHead() : createClientHead()
+      head = isSsr ? createServerHead() : createClientHead()
       app.use(head)
     }
 
     const router = createRouter({
-      history: import.meta.env.SSR
+      history: isSsr
         ? createMemoryHistory(routerOptions.base)
         : createWebHistory(routerOptions.base),
       scrollBehavior: async (to, _from, savedPosition) => {
@@ -297,7 +302,7 @@ export function createViteSsgApp(
     })
 
     const appRenderCallbacks: Array<() => void | Promise<void>> = []
-    const onSSRAppRendered = import.meta.env.SSR
+    const onSSRAppRendered = isSsr
       ? (cb: () => void | Promise<void>) => appRenderCallbacks.push(cb)
       : () => undefined
     const triggerOnSSRAppRendered = () => Promise.all(appRenderCallbacks.map((cb) => cb()))
@@ -306,7 +311,7 @@ export function createViteSsgApp(
       app,
       head,
       initialState: {},
-      isClient: !import.meta.env.SSR,
+      isClient: !isSsr,
       onSSRAppRendered,
       routePath,
       router,
@@ -315,7 +320,7 @@ export function createViteSsgApp(
       triggerOnSSRAppRendered
     }
 
-    if (!import.meta.env.SSR) {
+    if (!isSsr) {
       await documentReady()
       useManualScrollRestoration()
       ensureHistoryState()
@@ -338,7 +343,7 @@ export function createViteSsgApp(
       return true
     })
 
-    if (import.meta.env.SSR) {
+    if (isSsr) {
       const route = context.routePath ?? '/'
       await router.push(route)
       await router.isReady()
@@ -348,7 +353,7 @@ export function createViteSsgApp(
     return context
   }
 
-  if (!import.meta.env.SSR) {
+  if (!isSsrRuntime()) {
     ;(async () => {
       const hasInitialHash = Boolean(window.location.hash)
 

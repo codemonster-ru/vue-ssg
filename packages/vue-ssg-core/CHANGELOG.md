@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 1.3.2 - 2026-05-18
+
+### Patch Changes
+
+- Detect SSR at runtime instead of relying on `import.meta.env.SSR`, keeping server rendering behavior correct when the helper is bundled or reused outside Vite's static SSR replacement path.
+
 ## 1.3.1 - 2026-05-18
 
 ### Patch Changes
