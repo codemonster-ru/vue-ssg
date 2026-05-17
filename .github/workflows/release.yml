@@ -89,19 +89,16 @@ jobs:
           CHANGELOG_FILE="packages/vue-ssg-core/CHANGELOG.md"
 
           NOTES_SECTION=$(awk -v v="$VERSION" '
-            $0 ~ "^##[[:space:]]+v?" v "([[:space:]]|$)" { in_section = 1; print; next }
+            $0 ~ "^##[[:space:]]+v?" v "([[:space:]]|$)" { in_section = 1; next }
             $0 ~ "^##[[:space:]]+" { if (in_section) exit }
             in_section { print }
           ' "$CHANGELOG_FILE")
 
           if [ -z "$NOTES_SECTION" ]; then
-            NOTES_SECTION=$(printf '## %s\n\nNo changelog entry found in %s for this version.\n' "$VERSION" "$CHANGELOG_FILE")
+            NOTES_SECTION=$(printf 'No changelog entry found in %s for version %s.\n' "$CHANGELOG_FILE" "$VERSION")
           fi
 
-          {
-            printf 'Release %s\n\n' "$TAG"
-            printf '%s\n' "$NOTES_SECTION"
-          } > RELEASE_NOTES.md
+          printf '%s\n' "$NOTES_SECTION" > RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.5.0
@@ -189,19 +186,16 @@ jobs:
           CHANGELOG_FILE="packages/create-vue-ssg/CHANGELOG.md"
 
           NOTES_SECTION=$(awk -v v="$VERSION" '
-            $0 ~ "^##[[:space:]]+v?" v "([[:space:]]|$)" { in_section = 1; print; next }
+            $0 ~ "^##[[:space:]]+v?" v "([[:space:]]|$)" { in_section = 1; next }
             $0 ~ "^##[[:space:]]+" { if (in_section) exit }
             in_section { print }
           ' "$CHANGELOG_FILE")
 
           if [ -z "$NOTES_SECTION" ]; then
-            NOTES_SECTION=$(printf '## %s\n\nNo changelog entry found in %s for this version.\n' "$VERSION" "$CHANGELOG_FILE")
+            NOTES_SECTION=$(printf 'No changelog entry found in %s for version %s.\n' "$CHANGELOG_FILE" "$VERSION")
           fi
 
-          {
-            printf 'Release %s\n\n' "$TAG"
-            printf '%s\n' "$NOTES_SECTION"
-          } > RELEASE_NOTES.md
+          printf '%s\n' "$NOTES_SECTION" > RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.5.0
