@@ -1,5 +1,15 @@
 # @codemonster-ru/create-vue-ssg
 
+<!-- markdownlint-disable MD024 -->
+
+## 1.5.4 - 2026-05-18
+
+### Patch Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.3.1`.
+- Sync the docs template `createViteSsgApp` helper with the core hash-navigation and hydration fixes.
+- Update generated docs templates to current VueForge package versions.
+
 ## 1.5.3 - 2026-05-15
 
 ### Patch Changes
