@@ -2,6 +2,13 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 1.5.5 - 2026-05-18
+
+### Patch Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.3.2`.
+- Sync the docs template `createViteSsgApp` helper with the core runtime SSR detection fix.
+
 ## 1.5.4 - 2026-05-18
 
 ### Patch Changes
