@@ -29,6 +29,10 @@ type CreateViteSsgOptions = {
   transformState?: (state: Record<string, unknown>) => Record<string, unknown>
 }
 
+let isClientAppMounted = false
+const hashScrollWaitMs = 4000
+const hashScrollStabilizeFrames = 10
+
 async function documentReady(): Promise<void> {
   if (typeof document === 'undefined' || document.readyState !== 'loading') {
     return
@@ -41,6 +45,114 @@ async function documentReady(): Promise<void> {
 
 async function nextFrame(): Promise<void> {
   await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+}
+
+function getHashTargetElement(hash: string): HTMLElement | null {
+  if (typeof document === 'undefined') {
+    return null
+  }
+
+  const id = decodeURIComponent(hash.replace(/^#/, ''))
+
+  return id ? document.getElementById(id) : null
+}
+
+function getHashScrollPosition(hash: string): { left: number; top: number } | null {
+  if (typeof window === 'undefined') {
+    return null
+  }
+
+  const targetElement = getHashTargetElement(hash)
+
+  if (!targetElement) {
+    return null
+  }
+
+  const top = targetElement.getBoundingClientRect().top + window.scrollY - getStickyOffsetTop()
+
+  return {
+    left: 0,
+    top: Math.max(0, top)
+  }
+}
+
+function waitForHashTarget(hash: string): Promise<HTMLElement | null> {
+  if (
+    typeof document === 'undefined'
+    || typeof MutationObserver === 'undefined'
+    || !document.body
+  ) {
+    return Promise.resolve(null)
+  }
+
+  const initialTarget = getHashTargetElement(hash)
+
+  if (initialTarget) {
+    return Promise.resolve(initialTarget)
+  }
+
+  return new Promise((resolve) => {
+    let observer: MutationObserver | null = null
+
+    const stop = (target: HTMLElement | null) => {
+      window.clearTimeout(timeout)
+      window.clearInterval(interval)
+      observer?.disconnect()
+      resolve(target)
+    }
+
+    const findTarget = () => {
+      const target = getHashTargetElement(hash)
+
+      if (target) {
+        stop(target)
+      }
+    }
+
+    const timeout = window.setTimeout(() => {
+      stop(null)
+    }, hashScrollWaitMs)
+
+    const interval = window.setInterval(findTarget, 50)
+    observer = new MutationObserver(findTarget)
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    })
+  })
+}
+
+async function scrollToHash(hash: string, behavior: ScrollBehavior = 'smooth'): Promise<boolean> {
+  await nextFrame()
+  await nextFrame()
+
+  const target = await waitForHashTarget(hash)
+
+  if (!target || typeof window === 'undefined') {
+    return false
+  }
+
+  for (let attempt = 0; attempt < hashScrollStabilizeFrames; attempt += 1) {
+    const position = getHashScrollPosition(hash)
+
+    if (!position) {
+      return false
+    }
+
+    window.scrollTo({
+      ...position,
+      behavior: attempt === 0 ? behavior : 'auto'
+    })
+
+    await nextFrame()
+
+    if (attempt >= 2 && Math.abs(window.scrollY - position.top) < 2) {
+      return true
+    }
+  }
+
+  return true
 }
 
 function isVisibleElement(element: HTMLElement | null): element is HTMLElement {
@@ -106,16 +218,54 @@ function ensureHistoryState(): void {
   )
 }
 
+function useManualScrollRestoration(): void {
+  if (typeof window === 'undefined' || !('scrollRestoration' in window.history)) {
+    return
+  }
+
+  window.history.scrollRestoration = 'manual'
+}
+
+function setRootVisibility(rootContainer: string, visible: boolean): void {
+  if (typeof document === 'undefined') {
+    return
+  }
+
+  const root = document.querySelector<HTMLElement>(rootContainer)
+
+  if (!root) {
+    return
+  }
+
+  root.style.visibility = visible ? '' : 'hidden'
+}
+
+function hasHydratableRoot(rootContainer: string): boolean {
+  if (typeof document === 'undefined') {
+    return false
+  }
+
+  const root = document.querySelector<HTMLElement>(rootContainer)
+
+  return Boolean(root && root.innerHTML.trim().length > 0)
+}
+
 export function createViteSsgApp(
   App: Component,
   routerOptions: { base?: string; routes: RouteRecordRaw[] },
   fn?: (context: CreateViteSsgContext) => Promise<void> | void,
   options?: CreateViteSsgOptions
 ) {
-  const { rootContainer = '#app', transformState, useHead = true } = options ?? {}
+  const {
+    hydration = true,
+    rootContainer = '#app',
+    transformState,
+    useHead = true
+  } = options ?? {}
 
   async function createSsgApp(routePath?: string): Promise<CreateViteSsgContext> {
-    const app = import.meta.env.SSR || options?.hydration ? createSSRApp(App) : createApp(App)
+    const shouldHydrate = import.meta.env.SSR || (hydration && hasHydratableRoot(rootContainer))
+    const app = shouldHydrate ? createSSRApp(App) : createApp(App)
     let head: CreateViteSsgContext['head']
 
     if (useHead) {
@@ -128,27 +278,17 @@ export function createViteSsgApp(
         ? createMemoryHistory(routerOptions.base)
         : createWebHistory(routerOptions.base),
       scrollBehavior: async (to, _from, savedPosition) => {
+        if (!isClientAppMounted) {
+          return false
+        }
+
         if (savedPosition) {
           return savedPosition
         }
 
         if (to.hash) {
-          const targetHash = decodeURIComponent(to.hash)
-
-          await nextFrame()
-          await nextFrame()
-
-          const targetElement = document.querySelector<HTMLElement>(targetHash)
-
-          if (targetElement) {
-            const top = targetElement.getBoundingClientRect().top + window.scrollY - getStickyOffsetTop()
-
-            return {
-              left: 0,
-              top: Math.max(0, top),
-              behavior: 'smooth'
-            }
-          }
+          const scrolled = await scrollToHash(to.hash)
+          return scrolled ? false : { left: 0, top: 0 }
         }
 
         return { left: 0, top: 0 }
@@ -177,6 +317,7 @@ export function createViteSsgApp(
 
     if (!import.meta.env.SSR) {
       await documentReady()
+      useManualScrollRestoration()
       ensureHistoryState()
       context.initialState = transformState?.(getInitialState()) ?? getInitialState()
     }
@@ -209,9 +350,24 @@ export function createViteSsgApp(
 
   if (!import.meta.env.SSR) {
     ;(async () => {
+      const hasInitialHash = Boolean(window.location.hash)
+
+      if (hasInitialHash) {
+        setRootVisibility(rootContainer, false)
+      }
+
       const { app, router } = await createSsgApp()
       await router.isReady()
       app.mount(rootContainer, true)
+      isClientAppMounted = true
+
+      if (window.location.hash) {
+        await scrollToHash(window.location.hash, 'auto')
+      }
+
+      if (hasInitialHash) {
+        setRootVisibility(rootContainer, true)
+      }
     })()
   }
 

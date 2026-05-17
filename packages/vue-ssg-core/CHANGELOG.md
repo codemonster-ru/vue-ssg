@@ -1,5 +1,15 @@
 # @codemonster-ru/vue-ssg-core
 
+<!-- markdownlint-disable MD024 -->
+
+## 1.3.1 - 2026-05-18
+
+### Patch Changes
+
+- Improve hash navigation during client hydration by waiting for generated anchors, applying sticky-header offsets, and avoiding browser scroll restoration races.
+- Fall back to a client-only mount when the root container has no hydratable HTML, while keeping SSR output hydrated by default.
+- Update `@codemonster-ru/vueforge-core` to `^1.18.7` and align `@unhead/vue` on `^2.1.13`.
+
 ## 1.3.0 - 2026-05-15
 
 ### Minor Changes
@@ -61,6 +71,7 @@
 - Normalize internal markdown links in docs content rendering so `.md` and `.mdx` links resolve to generated SSG routes, while preserving query/hash fragments and leaving external/hash-only links unchanged.
 
 ## 1.0.1 - 2026-04-19
+
 ### Patch Changes
 
 - Fix markdown nested list rendering in docs content parser to prevent SSG build failures.
