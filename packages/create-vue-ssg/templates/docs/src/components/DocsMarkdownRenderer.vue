@@ -1,21 +1,32 @@
 <script setup lang="ts">
-import { useAttrs } from 'vue'
+import { onMounted, ref, useAttrs } from 'vue'
+import { RouterLink } from 'vue-router'
+import { VfTable } from '@codemonster-ru/vueforge-core'
+import { VfTabs } from '@codemonster-ru/vueforge-core'
 import { VfCodeBlock } from '@codemonster-ru/vueforge-codeblock'
 import { VfPlayground } from '@codemonster-ru/vueforge-playground'
-import { VfTable } from '@codemonster-ru/vueforge-core'
-import type { DocsContentBlock } from '@/content/docs'
 import {
   docsVirtualPlaygroundRegistry,
   docsVirtualPlaygroundSourceFileRegistry,
   docsVirtualPlaygroundSourceLanguageRegistry,
   docsVirtualPlaygroundSourceRegistry
-} from '@/content/playgroundRegistry.generated'
+} from '@/generated/playgroundRegistry.generated'
+import type { DocsContentBlock } from '@/content/docs'
 
 defineProps<{
   blocks: DocsContentBlock[]
+  path?: string
 }>()
 
 const attrs = useAttrs()
+const isHydrated = ref(false)
+
+onMounted(() => {
+  isHydrated.value = true
+})
+
+const hasHtml = (block: DocsContentBlock): block is DocsContentBlock & { html: string } =>
+  typeof (block as { html?: unknown }).html === 'string'
 
 function getMarkdownComponentDemoId(block: Extract<DocsContentBlock, { type: 'playground' }>): string | null {
   if (!block.entry || !block.files || block.renderMode !== 'component' || !block.entry.endsWith('.vue')) {
@@ -43,12 +54,6 @@ function getMarkdownComponentDemoId(block: Extract<DocsContentBlock, { type: 'pl
 
 function getPlaygroundComponentDemoId(block: Extract<DocsContentBlock, { type: 'playground' }>): string | null {
   return getMarkdownComponentDemoId(block)
-}
-
-function hasSandboxPlaygroundFiles(
-  block: Extract<DocsContentBlock, { type: 'playground' }>
-): block is Extract<DocsContentBlock, { type: 'playground' }> & { files: Record<string, string>, entry: string } {
-  return Boolean(block.files && block.entry)
 }
 
 function getPlaygroundSourceLanguage(entryPath: string): string {
@@ -99,6 +104,110 @@ function getVirtualPlaygroundComponentEntry(block: Extract<DocsContentBlock, { t
 
   return undefined
 }
+
+function getPlaygroundStyle(block: Extract<DocsContentBlock, { type: 'playground' }>): Record<string, string> {
+  if (block.height == null) {
+    return {}
+  }
+
+  return {
+    height: typeof block.height === 'number' ? `${block.height}px` : block.height
+  }
+}
+
+interface DocsLinkTabItem {
+  value: string
+  label: string
+  to: string
+}
+
+function getTabTo(item: unknown): string {
+  if (!item || typeof item !== 'object') {
+    return '/'
+  }
+
+  const to = (item as { to?: unknown }).to
+  return typeof to === 'string' ? to : '/'
+}
+
+function normalizePathname(pathname: string): string {
+  return pathname.replace(/\/+$/, '') || '/'
+}
+
+function isComponentLandingPath(pathname: string): boolean {
+  return /^\/[^/]+\/components\/[^/]+$/.test(normalizePathname(pathname))
+}
+
+function parseListAnchor(itemHtml: string): { href: string; label: string } | null {
+  const match = itemHtml.match(/<a[^>]*href=(["'])(.*?)\1[^>]*>([\s\S]*?)<\/a>/i)
+  if (!match) {
+    return null
+  }
+
+  const href = match[2]?.trim()
+  const label = (match[3] ?? '').replace(/<[^>]+>/g, '').trim()
+  if (!href || !label) {
+    return null
+  }
+
+  return { href, label }
+}
+
+function resolveTabPath(basePath: string, href: string): string | null {
+  if (href.startsWith('/')) {
+    return normalizePathname(href)
+  }
+
+  if (href.startsWith('./') && href.endsWith('.md')) {
+    const relativePath = href.slice(2).replace(/\.md$/i, '')
+    if (!relativePath) {
+      return null
+    }
+
+    return `${normalizePathname(basePath)}/${relativePath}`
+  }
+
+  if (!href.includes('://') && !href.startsWith('#')) {
+    return `${normalizePathname(basePath)}/${href.replace(/^\.?\//, '').replace(/\.md$/i, '')}`
+  }
+
+  return null
+}
+
+function getTabsForComponentLanding(
+  block: DocsContentBlock,
+  pagePath?: string
+): DocsLinkTabItem[] | null {
+  if (!pagePath || !isComponentLandingPath(pagePath) || block.type !== 'list' || block.ordered) {
+    return null
+  }
+
+  const tabs = block.items
+    .map((itemHtml, index) => {
+      const anchor = parseListAnchor(itemHtml)
+      if (!anchor) {
+        return null
+      }
+
+      const to = resolveTabPath(pagePath, anchor.href)
+      if (!to) {
+        return null
+      }
+
+      return {
+        value: String(index),
+        label: anchor.label,
+        to
+      }
+    })
+    .filter((item): item is DocsLinkTabItem => item !== null)
+
+  if (!tabs.length || tabs.length !== block.items.length) {
+    return null
+  }
+
+  return tabs
+}
 </script>
 
 <template>
@@ -116,37 +225,75 @@ function getVirtualPlaygroundComponentEntry(block: Extract<DocsContentBlock, { t
         <!-- eslint-enable vue/no-v-html -->
       </p>
 
-      <VfCodeBlock
-        v-else-if="block.type === 'code'"
-        :code="block.code"
-        :language="block.language"
-        theme="inherit"
-      />
+      <div v-else-if="block.type === 'code'">
+        <VfCodeBlock
+          :code="block.code"
+          :language="block.language"
+          :show-line-numbers="true"
+        />
+      </div>
+
       <template v-else-if="block.type === 'playground'">
         <VfPlayground
-          v-if="getPlaygroundComponentDemoId(block)"
+          v-if="isHydrated && getPlaygroundComponentDemoId(block)"
           mode="component"
           :component="docsVirtualPlaygroundRegistry[getPlaygroundComponentDemoId(block)!]"
           :component-source="getVirtualPlaygroundSource(block)"
           :component-files="getVirtualPlaygroundComponentFiles(block)"
           :component-entry="getVirtualPlaygroundComponentEntry(block)"
           :component-source-language="getVirtualPlaygroundSourceLanguage(block)"
+          initial-tab="preview"
           :show-code="block.showCode"
           :height="block.height"
-          theme="inherit"
         />
 
         <VfPlayground
-          v-else-if="hasSandboxPlaygroundFiles(block)"
+          v-else-if="isHydrated"
           :files="block.files"
           :entry="block.entry"
           :framework="block.framework"
           :autorun="block.autorun"
+          initial-tab="preview"
           :show-code="block.showCode"
           :height="block.height"
-          theme="inherit"
+        />
+
+        <div
+          v-else
+          aria-hidden="true"
+          class="vf-playground docs-playground-placeholder"
+          :style="getPlaygroundStyle(block)"
         />
       </template>
+
+      <ol v-else-if="block.type === 'list' && block.ordered">
+        <!-- eslint-disable vue/no-v-html -->
+        <li v-for="(item, itemIndex) in block.items" :key="itemIndex" v-html="item" />
+        <!-- eslint-enable vue/no-v-html -->
+      </ol>
+
+      <VfTabs
+        v-else-if="getTabsForComponentLanding(block, path)"
+        :items="getTabsForComponentLanding(block, path)!"
+      >
+        <template #tab="{ item }">
+          <RouterLink :to="getTabTo(item)">
+            {{ item.label }}
+          </RouterLink>
+        </template>
+      </VfTabs>
+
+      <ul v-else-if="block.type === 'list'">
+        <!-- eslint-disable vue/no-v-html -->
+        <li v-for="(item, itemIndex) in block.items" :key="itemIndex" v-html="item" />
+        <!-- eslint-enable vue/no-v-html -->
+      </ul>
+
+      <blockquote v-else-if="block.type === 'blockquote'">
+        <!-- eslint-disable vue/no-v-html -->
+        <div v-html="block.html" />
+        <!-- eslint-enable vue/no-v-html -->
+      </blockquote>
 
       <VfTable v-else-if="block.type === 'table'" striped>
         <template #header>
@@ -174,26 +321,8 @@ function getVirtualPlaygroundComponentEntry(block: Extract<DocsContentBlock, { t
         </tr>
       </VfTable>
 
-      <ol v-else-if="block.type === 'list' && block.ordered">
-        <!-- eslint-disable vue/no-v-html -->
-        <li v-for="(item, itemIndex) in block.items" :key="itemIndex" v-html="item" />
-        <!-- eslint-enable vue/no-v-html -->
-      </ol>
-
-      <ul v-else-if="block.type === 'list'">
-        <!-- eslint-disable vue/no-v-html -->
-        <li v-for="(item, itemIndex) in block.items" :key="itemIndex" v-html="item" />
-        <!-- eslint-enable vue/no-v-html -->
-      </ul>
-
-      <blockquote v-else-if="block.type === 'blockquote'">
-        <!-- eslint-disable vue/no-v-html -->
-        <div v-html="block.html" />
-        <!-- eslint-enable vue/no-v-html -->
-      </blockquote>
-
       <!-- eslint-disable vue/no-v-html -->
-      <div v-else-if="block.type === 'html'" v-html="block.html" />
+      <div v-else-if="hasHtml(block)" v-html="block.html" />
       <!-- eslint-enable vue/no-v-html -->
     </template>
   </article>
