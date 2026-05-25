@@ -5,7 +5,6 @@ import { useHead } from '@unhead/vue'
 import {
   VfButton,
   VfDrawer,
-  type VfNavMenuItem,
   VfNavMenu,
   VfTableOfContents,
   VfThemeProvider,
@@ -21,7 +20,6 @@ import {
   docsFooter,
   docsHeaderNav,
   docsLayout,
-  docsPackagesCatalog,
   docsPages,
   docsScrollOffset,
   docsSidebar,
@@ -53,32 +51,6 @@ const currentPageMeta = computed(() => ({
   title: currentPage.value.title,
   path: currentPage.value.path
 }))
-const pageHeadTitle = computed(() => {
-  if (isHomeRoute.value) {
-    return docsSite.title
-  }
-
-  if (isNotFoundRoute.value) {
-    return `Page not found | ${docsSite.title}`
-  }
-
-  return `${currentPage.value.title} | ${docsSite.title}`
-})
-const currentPackageKey = computed(() => {
-  if (isContentOnlyRoute.value) {
-    return null
-  }
-
-  const match = route.path.match(/^\/([^/]+)/)
-  const routePackageKey = match?.[1]
-
-  if (!routePackageKey) {
-    return null
-  }
-
-  const hasPackage = docsPackagesCatalog.some((entry) => entry.packageKey === routePackageKey)
-  return hasPackage ? routePackageKey : null
-})
 const isMobileSidebarOpen = ref(false)
 const isMobileTocOpen = ref(false)
 const sidebarNavRoot = ref<HTMLElement | null>(null)
@@ -166,103 +138,17 @@ const docsSearchIndex = computed<DocsSearchItem[]>(() =>
 )
 
 const shellLayout = computed(() => (isContentOnlyRoute.value ? 'content' : docsLayout.variant))
-const activePackageRepoUrl = computed(() => {
-  if (!currentPackageKey.value) {
-    return null
-  }
-
-  const packageEntry = docsPackagesCatalog.find((entry) => entry.packageKey === currentPackageKey.value)
-  const repo = packageEntry?.repo?.trim()
-
-  return repo || null
-})
-const headerSite = computed(() => {
-  if (!activePackageRepoUrl.value) {
-    return docsSite
-  }
-
-  return {
-    ...docsSite,
-    githubUrl: activePackageRepoUrl.value
-  }
-})
 const headerProps = computed(() => ({
-  site: headerSite.value,
+  site: docsSite,
   searchItems: docsSearchIndex.value
 }))
 const footerProps = computed(() => ({
   site: docsSite
 }))
-function subtreeHasValue(item: VfNavMenuItem, value: string): boolean {
-  if (item.value === value) {
-    return true
-  }
-
-  const stack = [...(item.children ?? [])]
-
-  while (stack.length > 0) {
-    const current = stack.shift()
-
-    if (!current) {
-      continue
-    }
-
-    if (current.value === value) {
-      return true
-    }
-
-    if (current.children) {
-      stack.push(...current.children)
-    }
-  }
-
-  return false
-}
-
-function getSidebarItemsForPackage(items: VfNavMenuItem[], packageKey: string, activePageId: string): VfNavMenuItem[] {
-  const packagesNode = items.find((item) => item.value === 'packages')
-
-  if (!packagesNode?.children) {
-    return items
-  }
-
-  const targetNode = packagesNode.children.find((item) => item.value === `packages-${packageKey}`)
-
-  if (!targetNode) {
-    return items
-  }
-
-  const packageChildren = targetNode.children ?? []
-
-  if (packageChildren.length === 0) {
-    return [targetNode]
-  }
-
-  // Package routes use the active version branch as the sidebar root.
-  const activeVersionNode = packageChildren.find((child) => subtreeHasValue(child, activePageId))
-  const fallbackVersionNode = packageChildren[0]
-  const resolvedVersionNode = activeVersionNode ?? fallbackVersionNode
-  const versionChildren = resolvedVersionNode.children ?? []
-
-  if (versionChildren.length > 0) {
-    return versionChildren
-  }
-
-  return packageChildren
-}
-
-const sidebarItems = computed(() => {
-  if (!currentPackageKey.value) {
-    return docsSidebar
-  }
-
-  return getSidebarItemsForPackage(docsSidebar, currentPackageKey.value, currentPage.value.id)
-})
-
 const sidebarProps = computed(() => ({
   site: docsSite,
   page: currentPageMeta.value,
-  items: sidebarItems.value
+  items: docsSidebar
 }))
 const asideProps = computed(() => ({
   site: docsSite,
@@ -310,7 +196,7 @@ async function syncTocScrollOffset(): Promise<void> {
   tocScrollOffset.value = computeStickyOffsetTop()
 }
 
-const findTopLevelActiveIndex = (items: VfNavMenuItem[], value: string): number =>
+const findTopLevelActiveIndex = (items: typeof docsSidebar, value: string): number =>
   items.findIndex((item) => {
     if (item.value === value) {
       return true
@@ -339,7 +225,7 @@ const findTopLevelActiveIndex = (items: VfNavMenuItem[], value: string): number 
 
 const updateSidebarIndicator = () => {
   const root = sidebarNavRoot.value
-  const topLevelIndex = findTopLevelActiveIndex(sidebarItems.value, currentPage.value.id)
+  const topLevelIndex = findTopLevelActiveIndex(docsSidebar, currentPage.value.id)
 
   if (!root || topLevelIndex === -1) {
     sidebarIndicatorVisible.value = false
@@ -531,33 +417,16 @@ function handleMobileTocClick(event: MouseEvent) {
   void router.push(href)
 }
 
-useHead(() => ({
-  title: pageHeadTitle.value,
+useHead({
+  title: docsSite.title,
   link: [
     {
       rel: 'icon',
       type: 'image/svg+xml',
-      href: faviconHref.value
-    },
-    {
-      rel: 'icon',
-      type: 'image/png',
-      sizes: '32x32',
-      href: '/favicon-32x32.png'
-    },
-    {
-      rel: 'icon',
-      type: 'image/png',
-      sizes: '192x192',
-      href: '/favicon-192x192.png'
-    },
-    {
-      rel: 'apple-touch-icon',
-      sizes: '180x180',
-      href: '/apple-touch-icon.png'
+      href: faviconHref
     }
   ]
-}))
+})
 </script>
 
 <template>
@@ -579,7 +448,7 @@ useHead(() => ({
         />
         <DocsDefaultHeader
           v-else
-          :site="headerSite"
+          :site="docsSite"
           :search-items="docsSearchIndex"
           :brand-component="docsComponents.Brand"
           :header-nav-component="docsComponents.HeaderNav"
@@ -637,7 +506,7 @@ useHead(() => ({
                 height: `${sidebarIndicatorHeight}px`
               }"
             />
-            <VfNavMenu :items="sidebarItems" :model-value="currentPage.id" />
+            <VfNavMenu :items="docsSidebar" :model-value="currentPage.id" />
           </div>
           <component
             :is="docsComponents.SidebarBottom"
@@ -714,7 +583,7 @@ useHead(() => ({
 
       <template #default>
         <div class="docs-header-drawer">
-          <VfNavMenu :items="sidebarItems" :model-value="currentPage.id" aria-label="Documentation navigation" />
+          <VfNavMenu :items="docsSidebar" :model-value="currentPage.id" aria-label="Documentation navigation" />
         </div>
       </template>
     </VfDrawer>

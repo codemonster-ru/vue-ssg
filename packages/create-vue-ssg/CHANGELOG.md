@@ -2,6 +2,14 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 1.6.0 - 2026-05-26
+
+### Minor Changes
+
+- Sync more docs shell files from `apps/demo` into the generated `docs` template (`App.vue`, `styles.css`, and docs views) to keep scaffolded UI aligned with the demo source of truth.
+- Extend `scripts/sync-docs-template.mjs` coverage and enforce template sync in CI via a dedicated sync step plus `git diff --exit-code` verification.
+- Document the docs template sync policy in `@codemonster-ru/create-vue-ssg` README.
+
 ## 1.5.6 - 2026-05-26
 
 ### Patch Changes
