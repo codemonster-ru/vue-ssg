@@ -30,6 +30,12 @@ jobs:
       - name: Ensure Rollup Linux Native Binary
         run: npm i --no-save @rollup/rollup-linux-x64-gnu
 
+      - name: Sync Docs Template
+        run: node scripts/sync-docs-template.mjs
+
+      - name: Verify Docs Template Is Synced
+        run: git diff --exit-code
+
       - name: App Check
         run: npm run check
 

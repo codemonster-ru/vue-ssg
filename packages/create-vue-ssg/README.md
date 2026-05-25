@@ -14,6 +14,17 @@ npm create @codemonster-ru/vue-ssg@latest my-docs
 
 Markdown content is loaded from `content/**/*.md` in the generated project.
 
+## Docs Template Sync Policy
+
+- `apps/demo` is the source of truth for the `docs` template shell.
+- Before publishing `@codemonster-ru/create-vue-ssg`, sync demo changes into the template:
+
+```bash
+node scripts/sync-docs-template.mjs
+```
+
+- CI enforces this policy and fails when the synced output differs.
+
 ## Options
 
 - `--template <name>`: template to use (`default` or `docs`)
