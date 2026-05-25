@@ -2,6 +2,14 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 1.5.6 - 2026-05-26
+
+### Patch Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^1.3.3`.
+- Update generated docs templates to current VueForge package versions.
+- Sync docs template playground registry generation and renderer with demo updates (safe markdown playground source escaping, generated registry path alignment, and component docs tab rendering).
+
 ## 1.5.5 - 2026-05-18
 
 ### Patch Changes
