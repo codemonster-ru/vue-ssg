@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref, useAttrs } from 'vue'
+import { defineAsyncComponent, onMounted, ref, useAttrs } from 'vue'
 import { RouterLink } from 'vue-router'
 import { VfTable } from '@codemonster-ru/vueforge-core'
 import { VfTabs } from '@codemonster-ru/vueforge-core'
 import { VfCodeBlock } from '@codemonster-ru/vueforge-codeblock'
-import { VfPlayground } from '@codemonster-ru/vueforge-playground'
 import {
   docsVirtualPlaygroundRegistry,
   docsVirtualPlaygroundSourceFileRegistry,
@@ -20,6 +19,10 @@ defineProps<{
 
 const attrs = useAttrs()
 const isHydrated = ref(false)
+const codeBlockAllowedLanguages = ['plaintext', 'text', 'bash', 'ts', 'typescript', 'vue'] as const
+const VfPlayground = defineAsyncComponent(() =>
+  import('@codemonster-ru/vueforge-playground').then((module) => module.VfPlayground)
+)
 
 onMounted(() => {
   isHydrated.value = true
@@ -229,6 +232,8 @@ function getTabsForComponentLanding(
         <VfCodeBlock
           :code="block.code"
           :language="block.language"
+          :allowed-languages="codeBlockAllowedLanguages"
+          language-fallback="plaintext"
           :show-line-numbers="true"
         />
       </div>
