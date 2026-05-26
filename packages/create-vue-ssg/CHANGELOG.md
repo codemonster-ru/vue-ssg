@@ -2,6 +2,14 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 1.6.1 - 2026-05-27
+
+### Patch Changes
+
+- Sync `docs` template markdown renderer with demo updates: lazy-load `VfPlayground` and configure `VfCodeBlock` language allowlist/fallback.
+- Sync `docs` template Vite build config with demo chunking strategy (`manualChunks`) to split large playground/codeblock bundles from the main app chunk.
+- Preserve executable mode for `bin/create-vue-ssg.js` in the release commit.
+
 ## 1.6.0 - 2026-05-26
 
 ### Minor Changes
