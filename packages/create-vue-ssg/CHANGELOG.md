@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 1.6.2 - 2026-05-27
+
+### Patch Changes
+
+- Pin VueForge package versions in the generated `docs` template (`@codemonster-ru/vueforge-codeblock`, `@codemonster-ru/vueforge-core`, `@codemonster-ru/vueforge-layouts`, `@codemonster-ru/vueforge-playground`) to avoid implicit range updates in scaffolded projects.
+
 ## 1.6.1 - 2026-05-27
 
 ### Patch Changes
