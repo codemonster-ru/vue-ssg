@@ -10,6 +10,30 @@ const markdownPlaygrounds = createMarkdownComponentPlaygrounds({
 
 export default defineConfig({
   plugins: [markdownPlaygrounds.plugin, vue()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('@codemonster-ru/vueforge-playground')) {
+            return 'vf-playground'
+          }
+          if (id.includes('@codemonster-ru/vueforge-playground-core')) {
+            return 'vf-playground'
+          }
+          if (id.includes('@codemonster-ru/vueforge-codeblock')) {
+            return 'vf-codeblock'
+          }
+          if (id.includes('node_modules/shiki')) {
+            return 'vf-codeblock'
+          }
+          if (id.includes('node_modules/typescript')) {
+            return 'vf-playground-runtime'
+          }
+          return undefined
+        }
+      }
+    }
+  },
   ssr: {
     noExternal: [
       '@codemonster-ru/vue-codeblock',
