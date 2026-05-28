@@ -4,6 +4,12 @@
 
 ## 2.0.1 - 2026-05-28
 
+## 2.0.2 - 2026-05-29
+
+### Patch Changes
+
+- Update `@codemonster-ru/vueforge-core` dependency to `^1.19.0`.
+
 ### Patch Changes
 
 - Normalize legacy `@codemonster-ru/vueforge-codeblock` and `@codemonster-ru/vueforge-playground` imports to new subpath exports (`/view`, `/ui`) when collecting markdown component playground sources.

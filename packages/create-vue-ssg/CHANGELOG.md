@@ -4,6 +4,15 @@
 
 ## 2.0.1 - 2026-05-28
 
+## 2.0.2 - 2026-05-29
+
+### Patch Changes
+
+- Update generated `docs` and `demo` dependency baselines to current `@codemonster-ru/vueforge-*` versions:
+  - `@codemonster-ru/vueforge-core@^1.19.0`
+  - `@codemonster-ru/vueforge-codeblock@^3.1.0`
+  - `@codemonster-ru/vueforge-playground@^2.1.0`
+
 ### Patch Changes
 
 - Sync docs template and demo markdown renderer/playground registry to:
