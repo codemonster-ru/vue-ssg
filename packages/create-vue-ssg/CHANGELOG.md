@@ -2,9 +2,11 @@
 
 <!-- markdownlint-disable MD024 -->
 
-## 2.0.1 - 2026-05-28
+## 2.0.4 - 2026-05-29
 
-## 2.0.2 - 2026-05-29
+### Patch Changes
+
+- Sync docs template renderer with `apps/demo` source-of-truth to satisfy `sync-docs-template` CI parity check.
 
 ## 2.0.3 - 2026-05-29
 
@@ -12,12 +14,16 @@
 
 - Sync docs template markdown renderer with skeleton-gated playground loading pattern to improve perceived loading behavior and keep parity with demo updates.
 
+## 2.0.2 - 2026-05-29
+
 ### Patch Changes
 
 - Update generated `docs` and `demo` dependency baselines to current `@codemonster-ru/vueforge-*` versions:
   - `@codemonster-ru/vueforge-core@^1.19.0`
   - `@codemonster-ru/vueforge-codeblock@^3.1.0`
   - `@codemonster-ru/vueforge-playground@^2.1.0`
+
+## 2.0.1 - 2026-05-28
 
 ### Patch Changes
 
