@@ -15,18 +15,16 @@ import { VueIconify, icons } from '@codemonster-ru/vueiconify'
 import { docsSite } from '@/content/docs'
 import defaultFaviconUrl from '@/assets/default-favicon.svg?url'
 import {
-  type DocsContentBlock,
+  type DocsPage,
   docsComponents,
   docsFooter,
   docsHeaderNav,
   docsLayout,
+  docsPages,
   docsScrollOffset,
   docsSidebar,
-  getDocsPageByPath,
-  loadDocsPageByPath,
-  loadDocsSearchIndex
+  getDocsPageByPath
 } from '@/content/docs'
-import type { VfTableOfContentsItem } from '@codemonster-ru/vueforge-core'
 import DocsDefaultHeader from '@/components/DocsDefaultHeader.vue'
 
 const faviconHref = computed(() => docsSite.favicon ?? defaultFaviconUrl)
@@ -37,8 +35,22 @@ const isXlUp = useBreakpoint('xl')
 const isHomeRoute = computed(() => route.path === '/')
 const isNotFoundRoute = computed(() => route.name === 'not-found')
 const isContentOnlyRoute = computed(() => isHomeRoute.value || isNotFoundRoute.value)
+const currentPage = computed(() => getDocsPageByPath(route.path))
 const showContentSubheader = computed(() => !isXlUp.value && !isContentOnlyRoute.value)
 const tocScrollOffset = ref(docsScrollOffset)
+const hasMobileToc = computed(() =>
+  !isContentOnlyRoute.value && currentPage.value.tableOfContents.length > 0
+)
+const mobileTocItems = computed(() =>
+  currentPage.value.tableOfContents.map((item) => ({
+    ...item,
+    href: `${currentPage.value.path}#${item.id}`
+  }))
+)
+const currentPageMeta = computed(() => ({
+  title: currentPage.value.title,
+  path: currentPage.value.path
+}))
 const isMobileSidebarOpen = ref(false)
 const isMobileTocOpen = ref(false)
 const sidebarNavRoot = ref<HTMLElement | null>(null)
@@ -62,27 +74,68 @@ interface DocsSearchItem {
   to: string
   keywords?: string
 }
-const docsSearchIndex = ref<DocsSearchItem[]>([])
-const currentPageShell = computed(() => getDocsPageByPath(route.path))
-const currentPagePayload = ref<{ blocks: DocsContentBlock[]; tableOfContents: VfTableOfContentsItem[] } | null>(null)
-const currentPage = computed(() => ({
-  ...currentPageShell.value,
-  blocks: currentPagePayload.value?.blocks ?? [],
-  tableOfContents: currentPagePayload.value?.tableOfContents ?? []
-}))
-const hasMobileToc = computed(() =>
-  !isContentOnlyRoute.value && currentPage.value.tableOfContents.length > 0
+
+function normalizeSearchText(value: string | undefined): string {
+  return (value ?? '').replace(/\s+/g, ' ').trim()
+}
+
+function stripHtml(value: string): string {
+  return value.replace(/<[^>]*>/g, ' ')
+}
+
+function getPageSnippet(page: DocsPage): string {
+  const summary = page.description
+    ? page.description
+    : page.blocks.find((block) => block.type === 'paragraph' || block.type === 'blockquote' || block.type === 'html')
+
+  if (!summary) {
+    return ''
+  }
+
+  if (typeof summary === 'string') {
+    return normalizeSearchText(summary).slice(0, 180)
+  }
+
+  const html = summary.type === 'paragraph' || summary.type === 'blockquote' || summary.type === 'html'
+    ? summary.html
+    : ''
+  return normalizeSearchText(stripHtml(html)).slice(0, 180)
+}
+
+const docsSearchIndex = computed<DocsSearchItem[]>(() =>
+  docsPages.flatMap((page) => {
+    const sectionLabel = page.section
+      .map((section) => section.replace(/[-_]/g, ' '))
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(' / ')
+    const pageBreadcrumb = sectionLabel ? `${sectionLabel} / ${page.title}` : page.title
+    const pageSnippet = getPageSnippet(page)
+    const pageKeywords = normalizeSearchText(
+      page.blocks
+        .filter((block) => block.type === 'heading')
+        .map((block) => stripHtml(block.html))
+        .join(' ')
+    )
+
+    const pageItem: DocsSearchItem = {
+      title: page.title,
+      breadcrumb: sectionLabel || 'Documentation',
+      snippet: pageSnippet,
+      to: page.path,
+      keywords: pageKeywords
+    }
+
+    const headingItems: DocsSearchItem[] = page.tableOfContents.map((heading) => ({
+      title: heading.label,
+      breadcrumb: pageBreadcrumb,
+      snippet: pageSnippet,
+      to: `${page.path}#${heading.id}`,
+      keywords: `${page.title} ${pageKeywords}`.trim()
+    }))
+
+    return [pageItem, ...headingItems]
+  })
 )
-const mobileTocItems = computed(() =>
-  currentPage.value.tableOfContents.map((item) => ({
-    ...item,
-    href: `${currentPage.value.path}#${item.id}`
-  }))
-)
-const currentPageMeta = computed(() => ({
-  title: currentPage.value.title,
-  path: currentPage.value.path
-}))
 
 const shellLayout = computed(() => (isContentOnlyRoute.value ? 'content' : docsLayout.variant))
 const headerProps = computed(() => ({
@@ -107,24 +160,6 @@ const { activeId } = useTableOfContents({
   items: computed(() => currentPage.value.tableOfContents),
   offset: computed(() => tocScrollOffset.value)
 })
-
-async function ensureCurrentPagePayload(pathname: string): Promise<void> {
-  const page = await loadDocsPageByPath(pathname)
-  currentPagePayload.value = page
-    ? {
-        blocks: page.blocks,
-        tableOfContents: page.tableOfContents
-      }
-    : null
-}
-
-async function ensureSearchIndex(): Promise<void> {
-  if (docsSearchIndex.value.length > 0) {
-    return
-  }
-
-  docsSearchIndex.value = await loadDocsSearchIndex()
-}
 
 function isVisibleElement(element: HTMLElement | null): element is HTMLElement {
   return Boolean(element && element.offsetParent !== null)
@@ -278,7 +313,6 @@ const handleWindowResize = () => {
 }
 
 onMounted(() => {
-  void ensureCurrentPagePayload(route.path)
   void syncTocScrollOffset()
   void animateSidebarIndicator()
   void syncTocIndicator()
@@ -347,7 +381,6 @@ watch(
 watch(
   () => route.path,
   () => {
-    void ensureCurrentPagePayload(route.path)
     isMobileSidebarOpen.value = false
     isMobileTocOpen.value = false
   }
@@ -417,7 +450,6 @@ useHead({
           v-else
           :site="docsSite"
           :search-items="docsSearchIndex"
-          @search-open="void ensureSearchIndex()"
           :brand-component="docsComponents.Brand"
           :header-nav-component="docsComponents.HeaderNav"
           :header-nav-items="docsHeaderNav.items"
