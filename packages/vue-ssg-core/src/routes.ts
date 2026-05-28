@@ -1,29 +1,29 @@
 import type { Component } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
-import type { DocsPage } from './docsContent'
+import type { DocsPageRouteMeta } from './docsContent'
 
-export interface CreateDocsRoutesInput {
-  docsPages: DocsPage[]
+export interface CreateDocsRoutesFromManifestInput {
+  docsRoutes: DocsPageRouteMeta[]
   homeEnabled: boolean
   homeComponent: Component
   pageComponent: Component
   notFoundComponent?: Component
 }
 
-export function createDocsRoutes({
-  docsPages,
+export function createDocsRoutesFromManifest({
+  docsRoutes,
   homeEnabled,
   homeComponent,
   pageComponent,
   notFoundComponent
-}: CreateDocsRoutesInput): RouteRecordRaw[] {
-  const docsPageRoutes: RouteRecordRaw[] = docsPages.map((page) => ({
+}: CreateDocsRoutesFromManifestInput): RouteRecordRaw[] {
+  const docsPageRoutes: RouteRecordRaw[] = docsRoutes.map((page) => ({
     path: page.path,
     name: page.id,
     component: pageComponent
   }))
 
-  const docsLandingRoute = [...docsPages].sort((left, right) => {
+  const docsLandingRoute = [...docsRoutes].sort((left, right) => {
     if (left.order !== right.order) {
       return left.order - right.order
     }

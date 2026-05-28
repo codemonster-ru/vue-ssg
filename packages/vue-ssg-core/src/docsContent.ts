@@ -76,6 +76,24 @@ export interface DocsPage {
   tableOfContents: VfTableOfContentsItem[]
 }
 
+export interface DocsPageRouteMeta {
+  id: string
+  path: string
+  sourcePath: string
+  isIndexPage: boolean
+  title: string
+  navTitle: string
+  description?: string
+  order: number
+  section: string[]
+}
+
+export interface DocsPagePayload {
+  id: string
+  blocks: DocsContentBlock[]
+  tableOfContents: VfTableOfContentsItem[]
+}
+
 interface Frontmatter {
   title?: string
   navTitle?: string
@@ -112,6 +130,26 @@ export interface ResolvedDocsContent {
   docsSiteTitle: string
   docsScrollOffset: number
   getDocsPageByPath: (pathname: string) => DocsPage
+}
+
+export interface DocsShellManifest {
+  docsSidebar: VfNavMenuItem[]
+  docsSite: DocsSiteConfig
+  docsLayout: Required<DocsLayoutConfig>
+  docsFooter: DocsFooterConfig
+  docsHome: Required<DocsHomeConfig>
+  docsHeaderNav: Required<DocsHeaderNavConfig>
+  docsComponents: DocsComponentsConfig
+  docsSiteTitle: string
+  docsScrollOffset: number
+}
+
+export interface DocsRouteManifest {
+  docsRoutes: DocsPageRouteMeta[]
+}
+
+export interface CreateDocsPagePayloadLoaderInput {
+  pagePayloads: Record<string, DocsPagePayload>
 }
 
 function parseFrontmatter(source: string): { data: Frontmatter; content: string } {
@@ -824,5 +862,73 @@ export function resolveDocsContent({ docsConfig, markdownFiles }: ResolveDocsCon
     docsSiteTitle,
     docsScrollOffset,
     getDocsPageByPath
+  }
+}
+
+export function createDocsPageRouteMeta(page: DocsPage): DocsPageRouteMeta {
+  return {
+    id: page.id,
+    path: page.path,
+    sourcePath: page.sourcePath,
+    isIndexPage: page.isIndexPage,
+    title: page.title,
+    navTitle: page.navTitle,
+    description: page.description,
+    order: page.order,
+    section: page.section
+  }
+}
+
+export function createDocsPagePayload(page: DocsPage): DocsPagePayload {
+  return {
+    id: page.id,
+    blocks: page.blocks,
+    tableOfContents: page.tableOfContents
+  }
+}
+
+export function createDocsShellManifest(resolved: ResolvedDocsContent): DocsShellManifest {
+  return {
+    docsSidebar: resolved.docsSidebar,
+    docsSite: resolved.docsSite,
+    docsLayout: resolved.docsLayout,
+    docsFooter: resolved.docsFooter,
+    docsHome: resolved.docsHome,
+    docsHeaderNav: resolved.docsHeaderNav,
+    docsComponents: resolved.docsComponents,
+    docsSiteTitle: resolved.docsSiteTitle,
+    docsScrollOffset: resolved.docsScrollOffset
+  }
+}
+
+export function createDocsRouteManifest(resolved: ResolvedDocsContent): DocsRouteManifest {
+  return {
+    docsRoutes: resolved.docsPages.map((page) => createDocsPageRouteMeta(page))
+  }
+}
+
+export function createDocsPagePayloadMap(resolved: ResolvedDocsContent): Record<string, DocsPagePayload> {
+  return Object.fromEntries(
+    resolved.docsPages.map((page) => [page.id, createDocsPagePayload(page)])
+  )
+}
+
+export function createDocsPagePayloadLoader({ pagePayloads }: CreateDocsPagePayloadLoaderInput): (routeId: string) => Promise<DocsPagePayload | undefined> {
+  const cache = new Map<string, DocsPagePayload>()
+
+  return async (routeId: string) => {
+    const cached = cache.get(routeId)
+
+    if (cached) {
+      return cached
+    }
+
+    const payload = pagePayloads[routeId]
+
+    if (payload) {
+      cache.set(routeId, payload)
+    }
+
+    return payload
   }
 }

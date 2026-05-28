@@ -2,6 +2,31 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.0.0 - 2026-05-28
+
+### Major Changes
+
+- Remove legacy `createDocsRoutes` and `CreateDocsRoutesInput` exports.
+- Keep only manifest-based docs routes API: `createDocsRoutesFromManifest`.
+- Add shell/page split helpers for docs architecture:
+  - `createDocsShellManifest`
+  - `createDocsRouteManifest`
+  - `createDocsPagePayloadMap`
+  - `createDocsPagePayloadLoader`
+- Add related docs content and manifest types:
+  - `DocsShellManifest`
+  - `DocsRouteManifest`
+  - `DocsPageRouteMeta`
+  - `DocsPagePayload`
+
+### Migration Notes
+
+- Replace:
+  - `createDocsRoutes({ docsPages, ... })`
+- With:
+  - `createDocsRoutesFromManifest({ docsRoutes, ... })`
+  - where `docsRoutes` is an array of route metadata (`DocsPageRouteMeta`), not full page payload.
+
 ## 1.3.3 - 2026-05-26
 
 ### Patch Changes
