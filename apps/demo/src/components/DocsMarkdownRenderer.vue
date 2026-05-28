@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, ref, useAttrs, type Component } from 'vue'
+import { defineAsyncComponent, markRaw, onMounted, ref, useAttrs, type Component } from 'vue'
 import { RouterLink } from 'vue-router'
 import { VfTable } from '@codemonster-ru/vueforge-core'
 import { VfTabs } from '@codemonster-ru/vueforge-core'
@@ -66,7 +66,7 @@ function getVirtualPlaygroundComponent(block: Extract<DocsContentBlock, { type: 
     return undefined
   }
 
-  return docsVirtualPlaygroundRegistry[demoId] as Component
+  return markRaw(docsVirtualPlaygroundRegistry[demoId] as Component)
 }
 
 function getPlaygroundSourceLanguage(entryPath: string): string {
