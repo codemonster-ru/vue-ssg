@@ -1,12 +1,26 @@
 export { createViteSsgApp } from './createViteSsgApp'
 export {
   resolveDocsContent,
+  createDocsPagePayload,
+  createDocsPagePayloadLoader,
+  createDocsPagePayloadMap,
+  createDocsPageRouteMeta,
+  createDocsRouteManifest,
+  createDocsShellManifest,
   type DocsContentBlock,
   type DocsPage,
+  type DocsPagePayload,
+  type DocsPageRouteMeta,
+  type DocsRouteManifest,
+  type DocsShellManifest,
+  type CreateDocsPagePayloadLoaderInput,
   type ResolvedDocsContent,
   type ResolveDocsContentInput
 } from './docsContent'
-export { createDocsRoutes, type CreateDocsRoutesInput } from './routes'
+export {
+  createDocsRoutesFromManifest,
+  type CreateDocsRoutesFromManifestInput
+} from './routes'
 export {
   defineDocsConfig,
   type DocsAsideProps,
