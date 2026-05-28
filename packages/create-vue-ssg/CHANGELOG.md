@@ -4,6 +4,18 @@
 
 ## 1.6.2 - 2026-05-27
 
+## 2.0.0 - 2026-05-28
+
+### Major Changes
+
+- Migrate the generated `docs` template to shell/page split architecture:
+  - route metadata is separated from page payload
+  - page payload is loaded lazily per route
+  - search index is loaded on-demand
+- Align generated docs template routing with `@codemonster-ru/vue-ssg-core@2` manifest-based API.
+- Sync `apps/demo` and docs template source-of-truth files for the new runtime model.
+- Update generated docs template dependencies to current `@codemonster-ru/*` versions compatible with the new imports/exports layout.
+
 ### Patch Changes
 
 - Pin VueForge package versions in the generated `docs` template (`@codemonster-ru/vueforge-codeblock`, `@codemonster-ru/vueforge-core`, `@codemonster-ru/vueforge-layouts`, `@codemonster-ru/vueforge-playground`) to avoid implicit range updates in scaffolded projects.
