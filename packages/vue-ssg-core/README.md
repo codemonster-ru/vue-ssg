@@ -9,5 +9,11 @@ Core APIs for building SSG applications on top of Vue + Vite SSG.
 ## Exports
 
 - `createViteSsgApp`
+- `resolveDocsContent`
+- `createDocsShellManifest`
+- `createDocsRouteManifest`
+- `createDocsPagePayloadMap`
+- `createDocsPagePayloadLoader`
+- `createDocsRoutesFromManifest`
 - `defineDocsConfig`
 - docs config types
