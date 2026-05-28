@@ -3,7 +3,7 @@ import { defineAsyncComponent, onMounted, ref, useAttrs } from 'vue'
 import { RouterLink } from 'vue-router'
 import { VfTable } from '@codemonster-ru/vueforge-core'
 import { VfTabs } from '@codemonster-ru/vueforge-core'
-import { VfCodeBlock } from '@codemonster-ru/vueforge-codeblock'
+import { VfCodeBlock } from '@codemonster-ru/vueforge-codeblock/view'
 import {
   docsVirtualPlaygroundRegistry,
   docsVirtualPlaygroundSourceFileRegistry,
@@ -21,7 +21,7 @@ const attrs = useAttrs()
 const isHydrated = ref(false)
 const codeBlockAllowedLanguages = ['plaintext', 'text', 'bash', 'ts', 'typescript', 'vue'] as const
 const VfPlayground = defineAsyncComponent(() =>
-  import('@codemonster-ru/vueforge-playground').then((module) => module.VfPlayground)
+  import('@codemonster-ru/vueforge-playground/ui').then((module) => module.VfPlayground)
 )
 
 onMounted(() => {
@@ -57,6 +57,16 @@ function getMarkdownComponentDemoId(block: Extract<DocsContentBlock, { type: 'pl
 
 function getPlaygroundComponentDemoId(block: Extract<DocsContentBlock, { type: 'playground' }>): string | null {
   return getMarkdownComponentDemoId(block)
+}
+
+function getVirtualPlaygroundComponent(block: Extract<DocsContentBlock, { type: 'playground' }>): any {
+  const demoId = getPlaygroundComponentDemoId(block)
+
+  if (!demoId) {
+    return undefined
+  }
+
+  return docsVirtualPlaygroundRegistry[demoId] as any
 }
 
 function getPlaygroundSourceLanguage(entryPath: string): string {
@@ -242,7 +252,7 @@ function getTabsForComponentLanding(
         <VfPlayground
           v-if="isHydrated && getPlaygroundComponentDemoId(block)"
           mode="component"
-          :component="docsVirtualPlaygroundRegistry[getPlaygroundComponentDemoId(block)!]"
+          :component="getVirtualPlaygroundComponent(block)"
           :component-source="getVirtualPlaygroundSource(block)"
           :component-files="getVirtualPlaygroundComponentFiles(block)"
           :component-entry="getVirtualPlaygroundComponentEntry(block)"
