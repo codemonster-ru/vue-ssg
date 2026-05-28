@@ -1,6 +1,6 @@
 {
   "name": "@codemonster-ru/vue-ssg-core",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Core APIs for Codemonster SSG apps.",
   "keywords": [
     "vue",
@@ -54,7 +54,7 @@
     "vue-router": "^4.0.0 || ^5.0.0"
   },
   "dependencies": {
-    "@codemonster-ru/vueforge-core": "^1.18.8",
+    "@codemonster-ru/vueforge-core": "^1.19.0",
     "@unhead/vue": "^2.1.13",
     "github-slugger": "^2.0.0",
     "marked": "^17.0.5"
