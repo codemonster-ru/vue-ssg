@@ -2,6 +2,13 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.0.1 - 2026-05-28
+
+### Patch Changes
+
+- Normalize legacy `@codemonster-ru/vueforge-codeblock` and `@codemonster-ru/vueforge-playground` imports to new subpath exports (`/view`, `/ui`) when collecting markdown component playground sources.
+- Generate playground component registry entries as `markRaw(...)` to avoid Vue component reactivity wrapping issues.
+
 ## 2.0.0 - 2026-05-28
 
 ### Major Changes
