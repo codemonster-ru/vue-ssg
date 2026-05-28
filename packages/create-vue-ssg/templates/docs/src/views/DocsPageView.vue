@@ -3,35 +3,12 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { VfTabs } from '@codemonster-ru/vueforge-core'
 import DocsMarkdownRenderer from '@/components/DocsMarkdownRenderer.vue'
-import { docsPages, getDocsPageByPath, loadDocsPageByPath } from '@/content/docs'
-import type { DocsContentBlock, DocsPageShell } from '@/content/docs'
+import { docsPages, getDocsPageByPath } from '@/content/docs'
+import type { DocsContentBlock, DocsPage } from '@/content/docs'
 
 const route = useRoute()
 const router = useRouter()
-const currentPageShell = computed(() => getDocsPageByPath(route.path))
-const currentPagePayload = ref<{ blocks: DocsContentBlock[] } | null>(null)
-const currentPage = computed(() => ({
-  ...currentPageShell.value,
-  blocks: currentPagePayload.value?.blocks ?? [],
-  tableOfContents: []
-}))
-
-async function syncCurrentPagePayload(pathname: string): Promise<void> {
-  const page = await loadDocsPageByPath(pathname)
-  currentPagePayload.value = page
-    ? {
-        blocks: page.blocks
-      }
-    : null
-}
-
-watch(
-  () => route.path,
-  () => {
-    void syncCurrentPagePayload(route.path)
-  },
-  { immediate: true }
-)
+const currentPage = computed(() => getDocsPageByPath(route.path))
 
 const componentPageMatch = computed(() =>
   route.path.match(/^\/([^/]+)\/components\/([^/]+)(?:\/(features|api|theming))?$/)
@@ -63,7 +40,7 @@ watch(
   { immediate: true }
 )
 
-function getComponentTabPage(basePath: string, tab: string): DocsPageShell | undefined {
+function getComponentTabPage(basePath: string, tab: string): DocsPage | undefined {
   const tabPath = tab === 'overview' ? basePath : `${basePath}/${tab}`
   return docsPages.find((page) => page.path === tabPath)
 }
@@ -140,29 +117,6 @@ const activeComponentPage = computed(() => {
 
   return pages.features ?? pages.api ?? pages.theming ?? pages.overview
 })
-
-const componentPayloadByPath = ref<Record<string, DocsContentBlock[]>>({})
-
-watch(
-  () => activeComponentPage.value?.path,
-  async (path) => {
-    if (!path || componentPayloadByPath.value[path]) {
-      return
-    }
-
-    const page = await loadDocsPageByPath(path)
-
-    if (!page) {
-      return
-    }
-
-    componentPayloadByPath.value = {
-      ...componentPayloadByPath.value,
-      [path]: page.blocks
-    }
-  },
-  { immediate: true }
-)
 
 function toText(html: string): string {
   return html.replace(/<[^>]+>/g, '').trim()
@@ -259,10 +213,9 @@ const componentPageHeaderBlocks = computed<DocsContentBlock[]>(() => {
 
 const renderedBlocks = computed(() => {
   if (activeComponentPage.value) {
-    const blocks = componentPayloadByPath.value[activeComponentPage.value.path] ?? []
     return stripFeaturesSummaryHeading(
       stripTabHeading(
-        stripLegacyTabsList(blocks),
+        stripLegacyTabsList(activeComponentPage.value.blocks),
         activeComponentTab.value
       ),
       activeComponentTab.value
