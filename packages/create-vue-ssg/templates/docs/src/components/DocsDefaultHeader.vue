@@ -26,9 +26,6 @@ const props = defineProps<{
   mobileNavItems?: VfNavMenuItem[]
   mobileNavAriaLabel?: string
 }>()
-const emit = defineEmits<{
-  (event: 'search-open'): void
-}>()
 
 const route = useRoute()
 const router = useRouter()
@@ -135,7 +132,6 @@ watch(isSearchPaletteOpen, (open) => {
 })
 
 function openSearchPalette(): void {
-  emit('search-open')
   isSearchPaletteOpen.value = true
 }
 
