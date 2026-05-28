@@ -2,7 +2,14 @@
 
 <!-- markdownlint-disable MD024 -->
 
-## 1.6.2 - 2026-05-27
+## 2.0.1 - 2026-05-28
+
+### Patch Changes
+
+- Sync docs template and demo markdown renderer/playground registry to:
+  - use `@codemonster-ru/vueforge-codeblock/view` and `@codemonster-ru/vueforge-playground/ui` imports
+  - use `markRaw(...)` for registry components to avoid Vue component reactivity wrapping
+- Keep docs template sync parity with `apps/demo` for CI `sync-docs-template` checks.
 
 ## 2.0.0 - 2026-05-28
 
@@ -15,6 +22,8 @@
 - Align generated docs template routing with `@codemonster-ru/vue-ssg-core@2` manifest-based API.
 - Sync `apps/demo` and docs template source-of-truth files for the new runtime model.
 - Update generated docs template dependencies to current `@codemonster-ru/*` versions compatible with the new imports/exports layout.
+
+## 1.6.2 - 2026-05-27
 
 ### Patch Changes
 
