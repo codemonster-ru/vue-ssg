@@ -6,6 +6,12 @@
 
 ## 2.0.2 - 2026-05-29
 
+## 2.0.3 - 2026-05-29
+
+### Patch Changes
+
+- Sync docs template markdown renderer with skeleton-gated playground loading pattern to improve perceived loading behavior and keep parity with demo updates.
+
 ### Patch Changes
 
 - Update generated `docs` and `demo` dependency baselines to current `@codemonster-ru/vueforge-*` versions:
