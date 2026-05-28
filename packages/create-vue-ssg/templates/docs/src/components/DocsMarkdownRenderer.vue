@@ -1,83 +1,30 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent, defineComponent, h, markRaw, onMounted, ref, shallowRef, useAttrs } from 'vue'
-import type { Component } from 'vue'
+import { defineAsyncComponent, markRaw, onMounted, ref, useAttrs, type Component } from 'vue'
 import { RouterLink } from 'vue-router'
 import { VfTable } from '@codemonster-ru/vueforge-core'
 import { VfTabs } from '@codemonster-ru/vueforge-core'
-import { VfSkeletonGate } from '@codemonster-ru/vueforge-core'
 import { VfCodeBlock } from '@codemonster-ru/vueforge-codeblock/view'
-import '@codemonster-ru/vueforge-codeblock/style.css'
+import {
+  docsVirtualPlaygroundRegistry,
+  docsVirtualPlaygroundSourceFileRegistry,
+  docsVirtualPlaygroundSourceLanguageRegistry,
+  docsVirtualPlaygroundSourceRegistry
+} from '@/generated/playgroundRegistry.generated'
 import type { DocsContentBlock } from '@/content/docs'
 
-const props = defineProps<{
+defineProps<{
   blocks: DocsContentBlock[]
   path?: string
 }>()
 
 const attrs = useAttrs()
 const isHydrated = ref(false)
-const docsVirtualPlaygroundRegistry = shallowRef<Record<string, Component>>({})
-const docsVirtualPlaygroundSourceFileRegistry = shallowRef<Record<string, string>>({})
-const docsVirtualPlaygroundSourceLanguageRegistry = shallowRef<Record<string, string>>({})
-const docsVirtualPlaygroundSourceRegistry = shallowRef<Record<string, string>>({})
-const readyPlaygroundKeys = shallowRef<Record<string, true>>({})
-const pendingPlaygroundReadyTimers = new Map<string, ReturnType<typeof setTimeout>>()
 const codeBlockAllowedLanguages = ['plaintext', 'text', 'bash', 'ts', 'typescript', 'vue'] as const
-const hasPlaygroundBlocks = computed(() => props.blocks.some((block) => block.type === 'playground'))
-const VfPlaygroundLoading = defineComponent({
-  name: 'DocsPlaygroundLoading',
-  props: {
-    height: {
-      type: [Number, String],
-      default: undefined
-    },
-    minHeight: {
-      type: [Number, String],
-      default: '320px'
-    }
-  },
-  setup(loadingProps) {
-    const toCssLength = (value: number | string | undefined): string | undefined => {
-      if (value == null) {
-        return undefined
-      }
-      return typeof value === 'number' ? `${value}px` : value
-    }
+const VfPlayground = defineAsyncComponent(() =>
+  import('@codemonster-ru/vueforge-playground/ui').then((module) => module.VfPlayground)
+)
 
-    return () =>
-      h('div', {
-        'aria-hidden': 'true',
-        class: 'vf-playground docs-playground-placeholder',
-        style: {
-          minHeight: toCssLength(loadingProps.minHeight),
-          height: toCssLength(loadingProps.height)
-        }
-      })
-  }
-})
-const VfPlayground = defineAsyncComponent({
-  loader: async () => {
-    const [, module] = await Promise.all([
-      import('@codemonster-ru/vueforge-playground/style.css'),
-      import('@codemonster-ru/vueforge-playground/ui')
-    ])
-    return module.VfPlayground
-  },
-  loadingComponent: VfPlaygroundLoading,
-  delay: 0
-})
-
-onMounted(async () => {
-  if (hasPlaygroundBlocks.value) {
-    const playgroundRegistryModule = await import('@/generated/playgroundRegistry.generated')
-    docsVirtualPlaygroundRegistry.value = Object.fromEntries(
-      Object.entries(playgroundRegistryModule.docsVirtualPlaygroundRegistry).map(([key, component]) => [key, markRaw(component)])
-    )
-    docsVirtualPlaygroundSourceFileRegistry.value = playgroundRegistryModule.docsVirtualPlaygroundSourceFileRegistry
-    docsVirtualPlaygroundSourceLanguageRegistry.value = playgroundRegistryModule.docsVirtualPlaygroundSourceLanguageRegistry
-    docsVirtualPlaygroundSourceRegistry.value = playgroundRegistryModule.docsVirtualPlaygroundSourceRegistry
-  }
-
+onMounted(() => {
   isHydrated.value = true
 })
 
@@ -95,10 +42,10 @@ function getMarkdownComponentDemoId(block: Extract<DocsContentBlock, { type: 'pl
   }
 
   const normalizedEntryContent = entryContent.trimEnd()
-  for (const [demoId, source] of Object.entries(docsVirtualPlaygroundSourceRegistry.value)) {
+  for (const [demoId, source] of Object.entries(docsVirtualPlaygroundSourceRegistry)) {
     if (
-      docsVirtualPlaygroundRegistry.value[demoId]
-      && docsVirtualPlaygroundSourceFileRegistry.value[demoId] === block.entry
+      docsVirtualPlaygroundRegistry[demoId]
+      && docsVirtualPlaygroundSourceFileRegistry[demoId] === block.entry
       && source.trimEnd() === normalizedEntryContent
     ) {
       return demoId
@@ -110,6 +57,16 @@ function getMarkdownComponentDemoId(block: Extract<DocsContentBlock, { type: 'pl
 
 function getPlaygroundComponentDemoId(block: Extract<DocsContentBlock, { type: 'playground' }>): string | null {
   return getMarkdownComponentDemoId(block)
+}
+
+function getVirtualPlaygroundComponent(block: Extract<DocsContentBlock, { type: 'playground' }>): Component | undefined {
+  const demoId = getPlaygroundComponentDemoId(block)
+
+  if (!demoId) {
+    return undefined
+  }
+
+  return markRaw(docsVirtualPlaygroundRegistry[demoId] as Component)
 }
 
 function getPlaygroundSourceLanguage(entryPath: string): string {
@@ -127,8 +84,8 @@ function getPlaygroundSourceLanguage(entryPath: string): string {
 
 function getVirtualPlaygroundSource(block: Extract<DocsContentBlock, { type: 'playground' }>): string {
   const demoId = getPlaygroundComponentDemoId(block)
-  if (demoId && docsVirtualPlaygroundSourceRegistry.value[demoId]) {
-    return docsVirtualPlaygroundSourceRegistry.value[demoId]
+  if (demoId && docsVirtualPlaygroundSourceRegistry[demoId]) {
+    return docsVirtualPlaygroundSourceRegistry[demoId]
   }
 
   return block.entry && block.files ? block.files[block.entry] ?? '' : ''
@@ -136,8 +93,8 @@ function getVirtualPlaygroundSource(block: Extract<DocsContentBlock, { type: 'pl
 
 function getVirtualPlaygroundSourceLanguage(block: Extract<DocsContentBlock, { type: 'playground' }>): string {
   const demoId = getPlaygroundComponentDemoId(block)
-  if (demoId && docsVirtualPlaygroundSourceLanguageRegistry.value[demoId]) {
-    return docsVirtualPlaygroundSourceLanguageRegistry.value[demoId]
+  if (demoId && docsVirtualPlaygroundSourceLanguageRegistry[demoId]) {
+    return docsVirtualPlaygroundSourceLanguageRegistry[demoId]
   }
 
   return block.entry ? getPlaygroundSourceLanguage(block.entry) : 'plaintext'
@@ -163,63 +120,12 @@ function getVirtualPlaygroundComponentEntry(block: Extract<DocsContentBlock, { t
 
 function getPlaygroundStyle(block: Extract<DocsContentBlock, { type: 'playground' }>): Record<string, string> {
   if (block.height == null) {
-    return {
-      minHeight: getPlaygroundMinHeight(block)
-    }
+    return {}
   }
 
   return {
     height: typeof block.height === 'number' ? `${block.height}px` : block.height
   }
-}
-
-function getCodeBlockMinHeight(block: Extract<DocsContentBlock, { type: 'code' }>): string {
-  const lines = block.code.split('\n').length
-  const estimatedHeight = Math.max(120, Math.min(520, 56 + lines * 22))
-  return `${estimatedHeight}px`
-}
-
-function getPlaygroundMinHeight(block: Extract<DocsContentBlock, { type: 'playground' }>): string {
-  if (block.height != null) {
-    return typeof block.height === 'number' ? `${block.height}px` : block.height
-  }
-
-  return '320px'
-}
-
-function getPlaygroundKey(block: Extract<DocsContentBlock, { type: 'playground' }>, index: number): string {
-  if (block.entry) {
-    return `${block.entry}:${index}`
-  }
-  return `playground:${index}`
-}
-
-function isPlaygroundReady(block: Extract<DocsContentBlock, { type: 'playground' }>, index: number): boolean {
-  return Boolean(readyPlaygroundKeys.value[getPlaygroundKey(block, index)])
-}
-
-function markPlaygroundReady(block: Extract<DocsContentBlock, { type: 'playground' }>, index: number): void {
-  const key = getPlaygroundKey(block, index)
-  if (readyPlaygroundKeys.value[key]) {
-    return
-  }
-  if (pendingPlaygroundReadyTimers.has(key)) {
-    return
-  }
-
-  const timer = setTimeout(() => {
-    pendingPlaygroundReadyTimers.delete(key)
-    readyPlaygroundKeys.value = {
-      ...readyPlaygroundKeys.value,
-      [key]: true
-    }
-  }, 160)
-
-  pendingPlaygroundReadyTimers.set(key, timer)
-}
-
-function onPlaygroundMounted(block: Extract<DocsContentBlock, { type: 'playground' }>, index: number): void {
-  markPlaygroundReady(block, index)
 }
 
 interface DocsLinkTabItem {
@@ -319,7 +225,7 @@ function getTabsForComponentLanding(
 
 <template>
   <article class="docs-content vf-prose" v-bind="attrs">
-    <template v-for="(block, index) in props.blocks" :key="`${block.type}-${index}`">
+    <template v-for="(block, index) in blocks" :key="`${block.type}-${index}`">
       <component :is="`h${block.depth}`" v-if="block.type === 'heading'" :id="block.id">
         <!-- eslint-disable vue/no-v-html -->
         <span v-html="block.html" />
@@ -339,48 +245,36 @@ function getTabsForComponentLanding(
           :allowed-languages="codeBlockAllowedLanguages"
           language-fallback="plaintext"
           :show-line-numbers="true"
-          :min-height="getCodeBlockMinHeight(block)"
         />
       </div>
 
       <template v-else-if="block.type === 'playground'">
-        <VfSkeletonGate :ready="isPlaygroundReady(block, index)" :min-height="getPlaygroundMinHeight(block)">
-          <template #skeleton>
-            <div aria-hidden="true" class="vf-playground docs-playground-placeholder" :style="getPlaygroundStyle(block)" />
-          </template>
+        <VfPlayground
+          v-if="isHydrated && getPlaygroundComponentDemoId(block)"
+          mode="component"
+          :component="getVirtualPlaygroundComponent(block)"
+          :component-source="getVirtualPlaygroundSource(block)"
+          :component-files="getVirtualPlaygroundComponentFiles(block)"
+          :component-entry="getVirtualPlaygroundComponentEntry(block)"
+          :component-source-language="getVirtualPlaygroundSourceLanguage(block)"
+          initial-tab="preview"
+          :show-code="block.showCode"
+          :height="block.height"
+        />
 
-          <VfPlayground
-            v-if="block.renderMode === 'component' && isHydrated && getPlaygroundComponentDemoId(block)"
-            mode="component"
-            :component="docsVirtualPlaygroundRegistry[getPlaygroundComponentDemoId(block)!]"
-            :component-source="getVirtualPlaygroundSource(block)"
-            :component-files="getVirtualPlaygroundComponentFiles(block)"
-            :component-entry="getVirtualPlaygroundComponentEntry(block)"
-            :component-source-language="getVirtualPlaygroundSourceLanguage(block)"
-            initial-tab="preview"
-            :show-code="block.showCode"
-            :min-height="getPlaygroundMinHeight(block)"
-            :height="block.height"
-            @vue:mounted="onPlaygroundMounted(block, index)"
-          />
-
-          <VfPlayground
-            v-else-if="block.renderMode !== 'component'"
-            :files="block.files"
-            :entry="block.entry"
-            :framework="block.framework"
-            :autorun="block.autorun"
-            initial-tab="preview"
-            :show-code="block.showCode"
-            :min-height="getPlaygroundMinHeight(block)"
-            :height="block.height"
-            @run="markPlaygroundReady(block, index)"
-            @vue:mounted="onPlaygroundMounted(block, index)"
-          />
-        </VfSkeletonGate>
+        <VfPlayground
+          v-else-if="isHydrated"
+          :files="block.files"
+          :entry="block.entry"
+          :framework="block.framework"
+          :autorun="block.autorun"
+          initial-tab="preview"
+          :show-code="block.showCode"
+          :height="block.height"
+        />
 
         <div
-          v-if="block.renderMode === 'component' && !(isHydrated && getPlaygroundComponentDemoId(block))"
+          v-else
           aria-hidden="true"
           class="vf-playground docs-playground-placeholder"
           :style="getPlaygroundStyle(block)"
@@ -394,8 +288,8 @@ function getTabsForComponentLanding(
       </ol>
 
       <VfTabs
-        v-else-if="getTabsForComponentLanding(block, props.path)"
-        :items="getTabsForComponentLanding(block, props.path)!"
+        v-else-if="getTabsForComponentLanding(block, path)"
+        :items="getTabsForComponentLanding(block, path)!"
       >
         <template #tab="{ item }">
           <RouterLink :to="getTabTo(item)">
