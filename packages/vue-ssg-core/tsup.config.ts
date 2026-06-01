@@ -6,5 +6,6 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ['vue', 'vue-router', '@unhead/vue', '@codemonster-ru/vueforge-core']
+  external: ['vue', 'vue-router', '@unhead/vue', '@codemonster-ru/vueforge-core'],
+  noExternal: ['marked', 'github-slugger']
 })

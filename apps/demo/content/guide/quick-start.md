@@ -15,8 +15,9 @@ import the shared styles.
 ```ts
 import { createApp } from 'vue'
 import VueForge from '@codemonster-ru/vueforge-core'
-import '@codemonster-ru/vueforge-core/styles.css'
-import '@codemonster-ru/vueforge-layouts/styles.css'
+import '@codemonster-ru/vueforge-core/base.css'
+import '@codemonster-ru/vueforge-core/theme.css'
+import '@codemonster-ru/vueforge-layouts/base.css'
 
 createApp(App).use(VueForge).mount('#app')
 ```

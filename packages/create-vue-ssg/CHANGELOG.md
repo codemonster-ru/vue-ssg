@@ -2,6 +2,13 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.0.5 - 2026-06-02
+
+### Patch Changes
+
+- Update generated template dependency baseline to `@codemonster-ru/vue-ssg-core@^2.0.3`.
+- Align generated docs entrypoint style imports with new VueForge package exports (`@codemonster-ru/vueforge-core/{base,theme}.css` and `@codemonster-ru/vueforge-layouts/base.css`) to prevent build failures after dependency updates.
+
 ## 2.0.4 - 2026-05-29
 
 ### Patch Changes

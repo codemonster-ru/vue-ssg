@@ -2,13 +2,20 @@
 
 <!-- markdownlint-disable MD024 -->
 
-## 2.0.1 - 2026-05-28
+## 2.0.3 - 2026-06-02
+
+### Patch Changes
+
+- Improve client hydration flow in `createViteSsgApp` by waiting for `documentReady()` before probing hydratable root state, and mount with an explicit hydration flag on client startup.
+- Keep docs template/runtime parity by syncing the same hydration logic in mirrored `createViteSsgApp` implementations.
 
 ## 2.0.2 - 2026-05-29
 
 ### Patch Changes
 
 - Update `@codemonster-ru/vueforge-core` dependency to `^1.19.0`.
+
+## 2.0.1 - 2026-05-28
 
 ### Patch Changes
 
