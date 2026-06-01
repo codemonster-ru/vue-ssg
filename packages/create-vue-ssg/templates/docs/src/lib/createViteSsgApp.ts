@@ -269,7 +269,13 @@ export function createViteSsgApp(
 
   async function createSsgApp(routePath?: string): Promise<CreateViteSsgContext> {
     const isSsr = isSsrRuntime()
-    const shouldHydrate = isSsr || (hydration && hasHydratableRoot(rootContainer))
+    let shouldHydrate = isSsr
+
+    if (!isSsr) {
+      await documentReady()
+      shouldHydrate = hydration && hasHydratableRoot(rootContainer)
+    }
+
     const app = shouldHydrate ? createSSRApp(App) : createApp(App)
     let head: CreateViteSsgContext['head']
 
@@ -321,7 +327,6 @@ export function createViteSsgApp(
     }
 
     if (!isSsr) {
-      await documentReady()
       useManualScrollRestoration()
       ensureHistoryState()
       context.initialState = transformState?.(getInitialState()) ?? getInitialState()
@@ -363,7 +368,8 @@ export function createViteSsgApp(
 
       const { app, router } = await createSsgApp()
       await router.isReady()
-      app.mount(rootContainer, true)
+      const shouldHydrate = hydration && hasHydratableRoot(rootContainer)
+      app.mount(rootContainer, shouldHydrate)
       isClientAppMounted = true
 
       if (window.location.hash) {
