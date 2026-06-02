@@ -2,6 +2,12 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.0.4 - 2026-06-03
+
+### Patch Changes
+
+- Update `@codemonster-ru/vueforge-core` dependency to `^1.22.2`.
+
 ## 2.0.3 - 2026-06-02
 
 ### Patch Changes

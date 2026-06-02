@@ -5,7 +5,8 @@
   "description": "Demo-style docs app for Codemonster SSG.",
   "type": "module",
   "scripts": {
-    "dev": "npm run docs:generate && npm run playgrounds:generate && vite --force",
+    "dev": "npm run docs:generate && npm run playgrounds:generate && vite",
+    "dev:force": "npm run docs:generate && npm run playgrounds:generate && vite --force",
     "docs:generate": "node ./scripts/generate-docs-artifacts.mjs",
     "playgrounds:generate": "node ./scripts/generate-playground-registry.mjs",
     "build": "rm -rf dist && npm run docs:generate && npm run playgrounds:generate && vue-tsc --noEmit && vite-ssg build",
@@ -14,11 +15,12 @@
     "check": "npm run typecheck && npm run build"
   },
   "dependencies": {
-    "@codemonster-ru/vue-ssg-core": "^2.0.3",
-    "@codemonster-ru/vueforge-codeblock": "^3.4.1",
-    "@codemonster-ru/vueforge-core": "^1.22.0",
-    "@codemonster-ru/vueforge-layouts": "^1.11.3",
-    "@codemonster-ru/vueforge-playground": "^2.4.1",
+    "@codemonster-ru/vue-ssg-core": "^2.0.4",
+    "@codemonster-ru/vueforge-codeblock": "^3.4.2",
+    "@codemonster-ru/vueforge-core": "^1.22.2",
+    "@codemonster-ru/vueforge-icons": "^1.4.0",
+    "@codemonster-ru/vueforge-layouts": "^1.13.2",
+    "@codemonster-ru/vueforge-playground": "^2.4.2",
     "@codemonster-ru/vueforge-theme": "^1.2.4",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@unhead/vue": "2.1.15",
