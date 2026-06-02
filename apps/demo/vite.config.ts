@@ -9,6 +9,20 @@ const markdownPlaygrounds = createMarkdownComponentPlaygrounds({
 })
 
 export default defineConfig({
+  optimizeDeps: {
+    entries: [
+      'index.html',
+      'src/**/*.{ts,vue}',
+      '!src/content/playgroundRegistry.generated.ts'
+    ],
+    exclude: ['@codemonster-ru/vueforge-codeblock'],
+    include: [
+      '@codemonster-ru/vueforge-core',
+      '@codemonster-ru/vueforge-core/*',
+      '@codemonster-ru/vueforge-layouts',
+      '@codemonster-ru/vueforge-layouts/*'
+    ]
+  },
   plugins: [markdownPlaygrounds.plugin, vue()],
   build: {
     rollupOptions: {
@@ -42,8 +56,7 @@ export default defineConfig({
       '@codemonster-ru/vueforge-layouts',
       '@codemonster-ru/vueforge-theme',
       '@codemonster-ru/vueforge-playground',
-      '@codemonster-ru/vueforge-icons',
-      '@codemonster-ru/vueiconify'
+      '@codemonster-ru/vueforge-icons'
     ]
   },
   resolve: {

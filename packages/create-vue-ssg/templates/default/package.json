@@ -4,13 +4,14 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --force",
+    "dev": "vite",
+    "dev:force": "vite --force",
     "build": "rm -rf dist && vue-tsc --noEmit && vite-ssg build",
     "preview": "vite preview",
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@codemonster-ru/vue-ssg-core": "^2.0.3",
+    "@codemonster-ru/vue-ssg-core": "^2.0.4",
     "vite-ssg": "^28.3.0",
     "vue": "^3.5.13",
     "vue-router": "^5.0.4"

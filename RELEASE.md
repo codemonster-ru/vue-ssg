@@ -81,6 +81,17 @@ git tag create-vue-ssg-vX.Y.Z
 git push origin create-vue-ssg-vX.Y.Z
 ```
 
+When both packages are released, publish the core tag first. After the core
+version is available from npm, verify the generated templates:
+
+```bash
+npm run build:template:default
+npm run build:template:docs
+```
+
+Then publish the CLI tag. This keeps scaffold template installation verifiable
+when templates depend on the new core version.
+
 3. `release.yml` runs per package tag, validates version/tag match, publishes the targeted package if not yet published, and creates a GitHub Release.
 
 ## 5. Smoke Test

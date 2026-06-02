@@ -11,6 +11,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "npm run -w @codemonster-ru/ssg-demo dev",
+    "dev:force": "npm run -w @codemonster-ru/ssg-demo dev:force",
     "setup:template:default": "npm install --prefix packages/create-vue-ssg/templates/default",
     "setup:template:docs": "npm install --prefix packages/create-vue-ssg/templates/docs",
     "dev:template:default": "npm run setup:template:default && npm run --prefix packages/create-vue-ssg/templates/default dev",
