@@ -2,6 +2,23 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.0.6 - 2026-06-03
+
+### Patch Changes
+
+- Update generated templates to depend on `@codemonster-ru/vue-ssg-core@^2.0.4`.
+- Update generated docs template VueForge dependency baselines:
+  - `@codemonster-ru/vueforge-codeblock@^3.4.2`
+  - `@codemonster-ru/vueforge-core@^1.22.2`
+  - replace deprecated `@codemonster-ru/vueiconify` with
+    `@codemonster-ru/vueforge-icons@^1.4.0`
+  - `@codemonster-ru/vueforge-layouts@^1.13.2`
+  - `@codemonster-ru/vueforge-playground@^2.4.2`
+- Use Vite's regular dependency cache for normal development and expose
+  `npm run dev:force` for explicit cache rebuilds.
+- Configure docs template Vite dependency optimization for VueForge packages to
+  avoid stale optimized dependency reload loops after local package updates.
+
 ## 2.0.5 - 2026-06-02
 
 ### Patch Changes
