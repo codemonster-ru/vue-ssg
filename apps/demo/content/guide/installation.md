@@ -28,3 +28,9 @@ layout surfaces are available everywhere.
 Register the VueForge plugin with a storage key and a default theme mode. That
 lets `VfThemeSwitch` and the rest of the theme runtime work consistently across
 the docs site.
+
+## Development Cache
+
+Use `npm run dev` for normal development. If a locally updated package leaves
+stale optimized dependencies in Vite's cache, run `npm run dev:force` once to
+rebuild them.

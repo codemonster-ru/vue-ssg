@@ -11,7 +11,7 @@ import {
   useTableOfContents
 } from '@codemonster-ru/vueforge-core'
 import { VfDocumentLayout, VfStack, useBreakpoint } from '@codemonster-ru/vueforge-layouts'
-import { VueIconify, icons } from '@codemonster-ru/vueiconify'
+import { VueIconify, icons } from '@codemonster-ru/vueforge-icons'
 import { docsSite } from '@/content/docs'
 import defaultFaviconUrl from '@/assets/default-favicon.svg?url'
 import {
