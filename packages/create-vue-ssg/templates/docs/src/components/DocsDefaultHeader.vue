@@ -139,6 +139,15 @@ function openSearchPalette(): void {
   isSearchPaletteOpen.value = true
 }
 
+function handleSearchInputKeydown(event: KeyboardEvent): void {
+  if (event.key !== 'Enter' && event.key !== ' ') {
+    return
+  }
+
+  event.preventDefault()
+  openSearchPalette()
+}
+
 function handleGlobalSearchShortcut(event: KeyboardEvent): void {
   if (event.key.toLowerCase() !== 'k') {
     return
@@ -338,8 +347,7 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
           leading-icon="magnifyingGlass"
           readonly
           @click="openSearchPalette"
-          @keydown.enter.prevent="openSearchPalette"
-          @keydown.space.prevent="openSearchPalette"
+          @keydown="handleSearchInputKeydown"
         >
           <template #trailing>
             <VfBadge class="docs-header__search-shortcut">{{ searchHotkeyLabel }}</VfBadge>
