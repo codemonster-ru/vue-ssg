@@ -21,6 +21,7 @@ export {
   createDocsRoutesFromManifest,
   type CreateDocsRoutesFromManifestInput
 } from './routes'
+export { resolveDocsRouteHref } from './docsLinks'
 export {
   defineDocsConfig,
   type DocsAsideProps,
