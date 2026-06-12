@@ -2,6 +2,14 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.1.0 - 2026-06-12
+
+### Minor Changes
+
+- Add the public `resolveDocsRouteHref` helper for resolving relative Markdown
+  links against the current docs route, normalizing `.md`/`.mdx` targets, and
+  rejecting external or non-navigation URLs.
+
 ## 2.0.4 - 2026-06-03
 
 ### Patch Changes

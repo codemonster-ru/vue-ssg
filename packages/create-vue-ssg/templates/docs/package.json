@@ -15,8 +15,8 @@
     "check": "npm run typecheck && npm run build"
   },
   "dependencies": {
-    "@codemonster-ru/vue-ssg-core": "^2.0.4",
-    "@codemonster-ru/vueforge-codeblock": "^3.4.2",
+    "@codemonster-ru/vue-ssg-core": "^2.1.0",
+    "@codemonster-ru/vueforge-codeblock": "^3.5.0",
     "@codemonster-ru/vueforge-core": "^1.22.2",
     "@codemonster-ru/vueforge-icons": "^1.4.0",
     "@codemonster-ru/vueforge-layouts": "^1.13.2",

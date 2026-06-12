@@ -2,6 +2,15 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.0.7 - 2026-06-12
+
+### Patch Changes
+
+- Update generated templates to depend on
+  `@codemonster-ru/vue-ssg-core@^2.1.0`.
+- Update the generated docs template to depend on
+  `@codemonster-ru/vueforge-codeblock@^3.5.0`.
+
 ## 2.0.6 - 2026-06-03
 
 ### Patch Changes
