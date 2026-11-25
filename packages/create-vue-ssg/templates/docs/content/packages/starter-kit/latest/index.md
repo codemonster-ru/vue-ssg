@@ -30,29 +30,29 @@ entry: /App.vue
 ```vue file=/App.vue
 <template>
   <main class="demo">
-    <VfCard outlined>
+    <CmCard>
       <h2>Vue runtime smoke</h2>
       <p>Bundled by Vite, rendered without iframe runtime.</p>
-      <VfBadge outlined>vueforge-core</VfBadge>
-      <VfButton color="accent">Smoke passed</VfButton>
-    </VfCard>
+      <CmBadge variant="outline">CodeMonster UI</CmBadge>
+      <CmButton>Smoke passed</CmButton>
+    </CmCard>
   </main>
 </template>
 
 <script setup>
-import { VfBadge, VfButton, VfCard } from '@codemonster-ru/vueforge-core'
+import { CmBadge, CmButton, CmCard } from '@codemonster-ru/ui-vue'
 </script>
 
 <style scoped>
 .demo {
-  padding: var(--vf-layout-space-layout-lg);
+  padding: var(--cm-space-6);
   display: grid;
   align-content: start;
-  gap: var(--vf-layout-space-layout-base);
+  gap: var(--cm-space-4);
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--vf-color-bg) 92%, var(--vf-color-brand-primary) 8%),
-    var(--vf-color-bg)
+    color-mix(in oklab, var(--cm-color-background-canvas) 92%, var(--cm-color-text-link) 8%),
+    var(--cm-color-background-canvas)
   );
 }
 
@@ -66,7 +66,7 @@ p {
   margin: 0 0 20px;
 }
 
-.vf-button {
+.cm-button {
   width: 100%;
   justify-content: center;
   margin-top: 20px;

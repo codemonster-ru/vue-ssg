@@ -38,10 +38,12 @@ export {
   type DocsLayoutConfig,
   type DocsLayoutProps,
   type DocsLayoutVariant,
+  type DocsNavItem,
   type DocsPageMeta,
   type DocsSectionConfig,
   type DocsSidebarProps,
   type DocsSiteConfig,
   type DocsSiteLogoConfig,
-  type DocsTocConfig
+  type DocsTocConfig,
+  type DocsTocItem
 } from './config'

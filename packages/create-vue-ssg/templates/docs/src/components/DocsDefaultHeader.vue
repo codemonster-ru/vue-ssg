@@ -1,19 +1,10 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import {
-  VfBadge,
-  VfCommandPalette,
-  VfDrawer,
-  VfIconButton,
-  VfInput,
-  VfMenuBar,
-  VfNavMenu,
-  VfTag,
-  VfThemeSwitch,
-  type VfNavMenuItem
-} from '@codemonster-ru/vueforge-core'
-import { VfInline, useBreakpoint } from '@codemonster-ru/vueforge-layouts'
+import { useBreakpoint } from '@codemonster-ru/ui-layouts'
+import { CmBadge, CmInline, VfCommandPalette, VfThemeSwitch } from '@codemonster-ru/ui-vue'
+import { VfDrawer, VfIconButton, VfInput, VfMenuBar, VfNavMenu } from '@codemonster-ru/ui-vue/historical'
+import type { DocsNavItem } from '@codemonster-ru/vue-ssg-core'
 import type { DocsSiteConfig } from '@/content/config'
 
 const props = defineProps<{
@@ -21,9 +12,9 @@ const props = defineProps<{
   searchItems?: DocsSearchItem[]
   brandComponent?: Component
   headerNavComponent?: Component
-  headerNavItems?: VfNavMenuItem[]
+  headerNavItems?: DocsNavItem[]
   headerNavAriaLabel?: string
-  mobileNavItems?: VfNavMenuItem[]
+  mobileNavItems?: DocsNavItem[]
   mobileNavAriaLabel?: string
 }>()
 const emit = defineEmits<{
@@ -56,7 +47,7 @@ const brandStyle = computed(() => {
   return {
     '--docs-logo-width': toCssSize(props.site.logo.width),
     '--docs-logo-height': toCssSize(props.site.logo.height),
-    '--docs-logo-color': 'var(--vf-color-primary)'
+    '--docs-logo-color': 'var(--cm-color-text-link)'
   }
 })
 
@@ -196,12 +187,12 @@ onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleGlobalSearchShortcut)
 })
 
-function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
+function findActiveNavValue(items: DocsNavItem[], pathname: string): string {
   const normalizedPath = pathname.replace(/\/$/, '') || '/'
   let matchedValue = ''
   let matchedLength = -1
 
-  const visit = (nodes: VfNavMenuItem[]) => {
+  const visit = (nodes: DocsNavItem[]) => {
     for (const node of nodes) {
       if (typeof node.to === 'string') {
         const candidate = node.to.replace(/\/$/, '') || '/'
@@ -250,10 +241,10 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
         <strong v-if="site.logo ? site.logoLabel : true">
           {{ site.logo ? site.logoLabel : site.title }}
         </strong>
-        <VfTag v-if="!site.logo">docs</VfTag>
+        <CmBadge v-if="!site.logo" variant="outline">docs</CmBadge>
       </RouterLink>
 
-      <VfInline v-else-if="!brandComponent" gap="0.85rem" align="center" class="docs-header__brand">
+      <CmInline v-else-if="!brandComponent" gap="0.85rem" align="center" class="docs-header__brand">
         <component
           :is="site.logo.component"
           v-if="site.logo?.component"
@@ -270,8 +261,8 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
         <strong v-if="site.logo ? site.logoLabel : true">
           {{ site.logo ? site.logoLabel : site.title }}
         </strong>
-        <VfTag v-if="!site.logo">docs</VfTag>
-      </VfInline>
+        <CmBadge v-if="!site.logo" variant="outline">docs</CmBadge>
+      </CmInline>
     </div>
 
     <div v-if="isLgUp" class="docs-header__left">
@@ -297,10 +288,10 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
         <strong v-if="site.logo ? site.logoLabel : true">
           {{ site.logo ? site.logoLabel : site.title }}
         </strong>
-        <VfTag v-if="!site.logo">docs</VfTag>
+        <CmBadge v-if="!site.logo" variant="outline">docs</CmBadge>
       </RouterLink>
 
-      <VfInline v-else-if="!brandComponent" gap="0.85rem" align="center">
+      <CmInline v-else-if="!brandComponent" gap="0.85rem" align="center">
         <component
           :is="site.logo.component"
           v-if="site.logo?.component"
@@ -317,8 +308,8 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
         <strong v-if="site.logo ? site.logoLabel : true">
           {{ site.logo ? site.logoLabel : site.title }}
         </strong>
-        <VfTag v-if="!site.logo">docs</VfTag>
-      </VfInline>
+        <CmBadge v-if="!site.logo" variant="outline">docs</CmBadge>
+      </CmInline>
 
       <div v-if="showHeaderNav" class="docs-header__nav">
         <component
@@ -340,20 +331,23 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
     </div>
 
     <div class="docs-header__right">
-      <VfInline v-if="isLgUp" gap="0.75rem" align="center">
-        <VfInput
-          class="docs-header__search"
-          placeholder="search"
-          leading-icon="magnifyingGlass"
-          readonly
-          @click="openSearchPalette"
-          @keydown="handleSearchInputKeydown"
-        >
-          <template #trailing>
-            <VfBadge class="docs-header__search-shortcut">{{ searchHotkeyLabel }}</VfBadge>
-          </template>
-        </VfInput>
-        <VfThemeSwitch size="lg" static thumb-contrast="inverse" />
+      <CmInline v-if="isLgUp" gap="0.75rem" align="center">
+        <div class="docs-header__search-wrap">
+          <VfInput
+            class="docs-header__search"
+            aria-label="Search documentation"
+            placeholder="search"
+            leading-icon="magnifyingGlass"
+            readonly
+            @click="openSearchPalette"
+            @keydown="handleSearchInputKeydown"
+          >
+            <template #trailing>
+              <CmBadge class="docs-header__search-shortcut">{{ searchHotkeyLabel }}</CmBadge>
+            </template>
+          </VfInput>
+        </div>
+        <VfThemeSwitch class="docs-header__theme-switch" size="lg" static thumb-contrast="inverse" />
         <VfIconButton
           v-if="site.githubUrl"
           icon="github"
@@ -362,8 +356,8 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
           aria-label="Open GitHub repository"
           @click="openGithubLink"
         />
-      </VfInline>
-      <VfInline v-else class="docs-header__mobile-actions" align="center">
+      </CmInline>
+      <CmInline v-else class="docs-header__mobile-actions" align="center">
         <VfIconButton
           icon="magnifyingGlass"
           variant="ghost"
@@ -379,7 +373,7 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
           aria-label="Open navigation"
           @click="isMobileNavOpen = true"
         />
-      </VfInline>
+      </CmInline>
     </div>
 
     <VfDrawer
@@ -420,7 +414,7 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
           </strong>
         </RouterLink>
 
-        <VfInline
+        <CmInline
           v-else-if="!brandComponent"
           gap="0.85rem"
           align="center"
@@ -442,13 +436,14 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
           <strong v-if="site.logo ? site.logoLabel : true">
             {{ site.logo ? site.logoLabel : site.title }}
           </strong>
-        </VfInline>
+        </CmInline>
       </template>
 
       <template #default>
         <div class="docs-header-drawer">
           <VfNavMenu
             v-if="mobileNavItems?.length"
+            variant="sidebar"
             :items="mobileNavItems"
             :model-value="activeMobileNavValue"
             :aria-label="mobileNavAriaLabel ?? 'Navigation'"
@@ -466,7 +461,7 @@ function findActiveNavValue(items: VfNavMenuItem[], pathname: string): string {
             aria-label="Open GitHub repository"
             @click="openGithubLink"
           />
-          <VfThemeSwitch size="lg" static thumb-contrast="inverse" />
+          <VfThemeSwitch class="docs-header__theme-switch" size="lg" static thumb-contrast="inverse" />
         </div>
       </template>
     </VfDrawer>
