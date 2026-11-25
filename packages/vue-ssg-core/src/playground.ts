@@ -87,12 +87,6 @@ export function parsePlaygroundSourceFiles(source: string): Record<string, strin
   return files
 }
 
-function normalizeLegacyVueforgeImports(source: string): string {
-  return source
-    .replace(/(['"])@codemonster-ru\/vueforge-codeblock\1/g, '$1@codemonster-ru/vueforge-codeblock/view$1')
-    .replace(/(['"])@codemonster-ru\/vueforge-playground\1/g, '$1@codemonster-ru/vueforge-playground/ui$1')
-}
-
 export function collectMarkdownComponentPlaygrounds(contentRoot: string): MarkdownComponentPlayground[] {
   const demos = new Map<string, MarkdownComponentPlayground>()
   const playgroundBlockRe = /^````playground-src\s*\n([\s\S]*?)\n````/gm
@@ -126,7 +120,7 @@ export function collectMarkdownComponentPlaygrounds(contentRoot: string): Markdo
         entry,
         files,
         id,
-        source: normalizeLegacyVueforgeImports(source)
+        source
       })
     }
   }

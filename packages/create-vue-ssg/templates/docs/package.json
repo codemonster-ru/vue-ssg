@@ -15,28 +15,30 @@
     "check": "npm run typecheck && npm run build"
   },
   "dependencies": {
-    "@codemonster-ru/vue-ssg-core": "^2.1.0",
-    "@codemonster-ru/vueforge-codeblock": "^3.5.0",
-    "@codemonster-ru/vueforge-core": "^1.22.2",
-    "@codemonster-ru/vueforge-icons": "^1.4.0",
-    "@codemonster-ru/vueforge-layouts": "^1.13.2",
-    "@codemonster-ru/vueforge-playground": "^2.4.2",
-    "@codemonster-ru/vueforge-theme": "^1.2.4",
+    "@codemonster-ru/ui-codeblock": "^1.0.0",
+    "@codemonster-ru/ui-css": "^2.0.0",
+    "@codemonster-ru/ui-icons": "^2.0.0",
+    "@codemonster-ru/ui-layouts": "^2.0.0",
+    "@codemonster-ru/ui-playground": "^1.0.0",
+    "@codemonster-ru/ui-tokens": "^2.0.0",
+    "@codemonster-ru/ui-vue": "^2.0.0",
+    "@codemonster-ru/vue-ssg-core": "^2.2.0",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@unhead/vue": "2.1.15",
     "vite-ssg": "^28.3.0",
-    "vue": "3.5.35",
+    "vue": "3.5.45",
     "vue-router": "5.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.19.15",
     "@vitejs/plugin-vue": "^6.0.5",
+    "jiti": "^2.6.1",
     "typescript": "^5.9.3",
-    "vite": "^8.0.8",
+    "vite": "^8.1.7",
     "vue-tsc": "^3.2.6"
   },
   "overrides": {
-    "vue": "3.5.35",
+    "vue": "3.5.45",
     "vue-router": "5.1.0"
   }
 }

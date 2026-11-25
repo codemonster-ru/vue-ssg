@@ -1,6 +1,5 @@
 import { Parser, type Tokens, marked } from 'marked'
 import GithubSlugger from 'github-slugger'
-import type { VfNavMenuItem, VfTableOfContentsItem } from '@codemonster-ru/vueforge-core'
 import type {
   DocsComponentsConfig,
   DocsConfig,
@@ -8,7 +7,9 @@ import type {
   DocsHeaderNavConfig,
   DocsHomeConfig,
   DocsLayoutConfig,
-  DocsSiteConfig
+  DocsNavItem,
+  DocsSiteConfig,
+  DocsTocItem
 } from './config'
 
 export type DocsTableAlign = 'left' | 'center' | 'right' | null
@@ -73,7 +74,7 @@ export interface DocsPage {
   order: number
   section: string[]
   blocks: DocsContentBlock[]
-  tableOfContents: VfTableOfContentsItem[]
+  tableOfContents: DocsTocItem[]
 }
 
 export interface DocsPageRouteMeta {
@@ -91,7 +92,7 @@ export interface DocsPageRouteMeta {
 export interface DocsPagePayload {
   id: string
   blocks: DocsContentBlock[]
-  tableOfContents: VfTableOfContentsItem[]
+  tableOfContents: DocsTocItem[]
 }
 
 interface Frontmatter {
@@ -120,7 +121,7 @@ export interface ResolveDocsContentInput {
 
 export interface ResolvedDocsContent {
   docsPages: DocsPage[]
-  docsSidebar: VfNavMenuItem[]
+  docsSidebar: DocsNavItem[]
   docsSite: DocsSiteConfig
   docsLayout: Required<DocsLayoutConfig>
   docsFooter: DocsFooterConfig
@@ -133,7 +134,7 @@ export interface ResolvedDocsContent {
 }
 
 export interface DocsShellManifest {
-  docsSidebar: VfNavMenuItem[]
+  docsSidebar: DocsNavItem[]
   docsSite: DocsSiteConfig
   docsLayout: Required<DocsLayoutConfig>
   docsFooter: DocsFooterConfig
@@ -560,12 +561,12 @@ function parsePlaygroundSourceCodeBlock(token: Tokens.Code, sourcePath: string):
 
 function renderMarkdown(markdown: string, tocLevels: Set<number>, sourcePath: string): {
   blocks: DocsContentBlock[]
-  tableOfContents: VfTableOfContentsItem[]
+  tableOfContents: DocsTocItem[]
 } {
   const tokens = marked.lexer(markdown) as TokensList
   normalizeMarkdownLinks(tokens)
   const headingSlugger = new GithubSlugger()
-  const tableOfContents: VfTableOfContentsItem[] = []
+  const tableOfContents: DocsTocItem[] = []
   const blocks: DocsContentBlock[] = []
 
   for (const token of tokens) {
@@ -713,7 +714,7 @@ function getPageNavKey(page: DocsPage): string {
   return page.path.split('/').filter(Boolean).at(-1) ?? page.id
 }
 
-function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[] {
+function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): DocsNavItem[] {
   const root = new Map<string, NavNode>()
 
   for (const page of pages) {
@@ -752,9 +753,9 @@ function buildSidebar(pages: DocsPage[], docsConfig: DocsConfig): VfNavMenuItem[
     })
   }
 
-  const toItems = (nodes: Map<string, NavNode>): VfNavMenuItem[] =>
+  const toItems = (nodes: Map<string, NavNode>): DocsNavItem[] =>
     sortNodes([...nodes.values()]).map((node) => {
-      const item: VfNavMenuItem = {
+      const item: DocsNavItem = {
         value: node.value ?? toValueFromPath(node.path ?? node.label),
         label: node.label
       }

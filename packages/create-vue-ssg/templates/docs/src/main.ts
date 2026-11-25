@@ -1,17 +1,11 @@
-import VueForgeLayouts from '@codemonster-ru/vueforge-layouts'
-import '@codemonster-ru/vueforge-codeblock/style.css'
-import '@codemonster-ru/vueforge-core/base.css'
-import '@codemonster-ru/vueforge-core/theme.css'
-import '@codemonster-ru/vueforge-layouts/base.css'
-import '@codemonster-ru/vueforge-playground/style.css'
+import '@codemonster-ru/ui-tokens/tokens.css'
+import '@codemonster-ru/ui-css/fonts.css'
+import '@codemonster-ru/ui-css/styles.css'
+import '@codemonster-ru/ui-codeblock/style.css'
+import '@codemonster-ru/ui-playground/style.css'
 import App from './App.vue'
 import { createViteSsgApp } from './lib/createViteSsgApp'
 import { routes } from './routes'
 import './styles.css'
 
-export const createApp = createViteSsgApp(App, { routes }, ({ app }) => {
-  app.use(VueForgeLayouts, {
-    defaultTheme: 'system',
-    themeStorageKey: 'codemonster-docs-theme'
-  })
-})
+export const createApp = createViteSsgApp(App, { routes })

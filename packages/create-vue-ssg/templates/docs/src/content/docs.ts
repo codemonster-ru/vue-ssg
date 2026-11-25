@@ -2,7 +2,7 @@ import docsConfig from '../../ssg.config'
 import shellManifest from './generated/docs-shell-manifest.json'
 import routeManifest from './generated/docs-route-manifest.json'
 import type { DocsContentBlock } from '@codemonster-ru/vue-ssg-core'
-import type { VfNavMenuItem, VfTableOfContentsItem } from '@codemonster-ru/vueforge-core'
+import type { DocsNavItem, DocsTocItem } from '@codemonster-ru/vue-ssg-core'
 import type {
   DocsComponentsConfig,
   DocsFooterConfig,
@@ -23,7 +23,7 @@ export interface DocsPage {
   order: number
   section: string[]
   blocks: DocsContentBlock[]
-  tableOfContents: VfTableOfContentsItem[]
+  tableOfContents: DocsTocItem[]
 }
 export type { DocsContentBlock }
 
@@ -80,9 +80,9 @@ export function toPublicDocsPath(pathname: string): string {
   return restPath ? `/${packageKey}/${restPath}` : `/${packageKey}/`
 }
 
-function mapSidebarToPublicPaths(items: VfNavMenuItem[]): VfNavMenuItem[] {
+function mapSidebarToPublicPaths(items: DocsNavItem[]): DocsNavItem[] {
   return items.map((item) => {
-    const nextItem: VfNavMenuItem = {
+    const nextItem: DocsNavItem = {
       ...item
     }
 
@@ -110,7 +110,7 @@ for (const page of docsPages) {
   docsPagesByPath.set(normalizePath(page.path), page)
 }
 
-const docsSidebar = mapSidebarToPublicPaths(shellManifest.docsSidebar as VfNavMenuItem[])
+const docsSidebar = mapSidebarToPublicPaths(shellManifest.docsSidebar as DocsNavItem[])
 
 const packageMetadataFiles = import.meta.glob('../../content/**/metadata.json', {
   import: 'default',
@@ -163,7 +163,7 @@ const docsPackages: DocsPackage[] = Object.entries(packageMetadataFiles)
   .sort((left, right) => left.packageName.localeCompare(right.packageName))
 
 const pagePayloadModules = import.meta.glob('./generated/docs-page-payloads/*.json') as Record<string, () => Promise<unknown>>
-const pagePayloadCache = new Map<string, Promise<{ blocks: DocsContentBlock[]; tableOfContents: VfTableOfContentsItem[] } | undefined>>()
+const pagePayloadCache = new Map<string, Promise<{ blocks: DocsContentBlock[]; tableOfContents: DocsTocItem[] } | undefined>>()
 
 function getPayloadModulePath(routeId: string): string {
   return `./generated/docs-page-payloads/${routeId}.json`
@@ -175,7 +175,7 @@ export function getDocsPageByPath(pathname: string): DocsPageShell {
   return docsPagesByPath.get(normalizedPath) ?? docsPages[0]
 }
 
-export function loadDocsPagePayload(routeId: string): Promise<{ blocks: DocsContentBlock[]; tableOfContents: VfTableOfContentsItem[] } | undefined> {
+export function loadDocsPagePayload(routeId: string): Promise<{ blocks: DocsContentBlock[]; tableOfContents: DocsTocItem[] } | undefined> {
   const cached = pagePayloadCache.get(routeId)
 
   if (cached) {
@@ -192,7 +192,7 @@ export function loadDocsPagePayload(routeId: string): Promise<{ blocks: DocsCont
 
   const pending = moduleLoader()
     .then((module) => {
-      const data = (module as { default?: { blocks?: DocsContentBlock[]; tableOfContents?: VfTableOfContentsItem[] } }).default
+      const data = (module as { default?: { blocks?: DocsContentBlock[]; tableOfContents?: DocsTocItem[] } }).default
 
       if (!data) {
         return undefined

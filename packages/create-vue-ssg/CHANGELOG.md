@@ -2,6 +2,11 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.1.0
+
+- Generate both templates with Vue SSG Core 2.2.0 and migrate the docs shell to CodeMonster UI.
+- Preserve syntax highlighting and runnable Vue playgrounds through the dedicated CodeMonster UI packages.
+
 ## 2.0.7 - 2026-06-12
 
 ### Patch Changes

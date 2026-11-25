@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { VfButton } from '@codemonster-ru/vueforge-core'
-import { useBreakpoint } from '@codemonster-ru/vueforge-layouts'
+import { CmButton } from '@codemonster-ru/ui-vue'
+import { useBreakpoint } from '@codemonster-ru/ui-layouts'
 import { docsComponents, docsHome, docsSite } from '@/content/docs'
 
 const router = useRouter()
@@ -46,19 +46,19 @@ function openAction(action: { to?: string; href?: string }) {
       </div>
 
       <div class="docs-home__actions" :class="{ 'docs-home__actions--compact': isCompactHomeHero }">
-        <VfButton
+        <CmButton
           v-if="docsHome.primaryAction.label && hasActionLink(docsHome.primaryAction)"
           @click="openAction(docsHome.primaryAction)"
         >
           {{ docsHome.primaryAction.label }}
-        </VfButton>
-        <VfButton
+        </CmButton>
+        <CmButton
           v-if="docsHome.secondaryAction.label && hasActionLink(docsHome.secondaryAction)"
           variant="secondary"
           @click="openAction(docsHome.secondaryAction)"
         >
           {{ docsHome.secondaryAction.label }}
-        </VfButton>
+        </CmButton>
       </div>
     </section>
   </main>
