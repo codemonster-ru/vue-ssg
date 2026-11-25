@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { defineAsyncComponent, markRaw, onMounted, ref, useAttrs, type Component } from 'vue'
 import { RouterLink } from 'vue-router'
-import { VfTable } from '@codemonster-ru/vueforge-core'
-import { VfTabs } from '@codemonster-ru/vueforge-core'
-import { VfCodeBlock } from '@codemonster-ru/vueforge-codeblock/view'
+import { CmTable } from '@codemonster-ru/ui-vue'
+import { VfCodeBlock } from '@codemonster-ru/ui-codeblock/view'
 import {
   docsVirtualPlaygroundRegistry,
   docsVirtualPlaygroundSourceFileRegistry,
@@ -19,9 +18,9 @@ defineProps<{
 
 const attrs = useAttrs()
 const isHydrated = ref(false)
-const codeBlockAllowedLanguages = ['plaintext', 'text', 'bash', 'ts', 'typescript', 'vue'] as const
+const codeBlockAllowedLanguages = ['plaintext', 'text', 'bash', 'ts', 'typescript', 'vue']
 const VfPlayground = defineAsyncComponent(() =>
-  import('@codemonster-ru/vueforge-playground/ui').then((module) => module.VfPlayground)
+  import('@codemonster-ru/ui-playground/ui').then((module) => module.VfPlayground)
 )
 
 onMounted(() => {
@@ -128,19 +127,9 @@ function getPlaygroundStyle(block: Extract<DocsContentBlock, { type: 'playground
   }
 }
 
-interface DocsLinkTabItem {
-  value: string
+interface DocsPageLink {
   label: string
   to: string
-}
-
-function getTabTo(item: unknown): string {
-  if (!item || typeof item !== 'object') {
-    return '/'
-  }
-
-  const to = (item as { to?: unknown }).to
-  return typeof to === 'string' ? to : '/'
 }
 
 function normalizePathname(pathname: string): string {
@@ -187,16 +176,16 @@ function resolveTabPath(basePath: string, href: string): string | null {
   return null
 }
 
-function getTabsForComponentLanding(
+function getLinksForComponentLanding(
   block: DocsContentBlock,
   pagePath?: string
-): DocsLinkTabItem[] | null {
+): DocsPageLink[] | null {
   if (!pagePath || !isComponentLandingPath(pagePath) || block.type !== 'list' || block.ordered) {
     return null
   }
 
-  const tabs = block.items
-    .map((itemHtml, index) => {
+  const links = block.items
+    .map((itemHtml) => {
       const anchor = parseListAnchor(itemHtml)
       if (!anchor) {
         return null
@@ -208,23 +197,22 @@ function getTabsForComponentLanding(
       }
 
       return {
-        value: String(index),
         label: anchor.label,
         to
       }
     })
-    .filter((item): item is DocsLinkTabItem => item !== null)
+    .filter((item): item is DocsPageLink => item !== null)
 
-  if (!tabs.length || tabs.length !== block.items.length) {
+  if (!links.length || links.length !== block.items.length) {
     return null
   }
 
-  return tabs
+  return links
 }
 </script>
 
 <template>
-  <article class="docs-content vf-prose" v-bind="attrs">
+  <article class="docs-content" v-bind="attrs">
     <template v-for="(block, index) in blocks" :key="`${block.type}-${index}`">
       <component :is="`h${block.depth}`" v-if="block.type === 'heading'" :id="block.id">
         <!-- eslint-disable vue/no-v-html -->
@@ -276,7 +264,7 @@ function getTabsForComponentLanding(
         <div
           v-else
           aria-hidden="true"
-          class="vf-playground docs-playground-placeholder"
+          class="docs-playground-placeholder"
           :style="getPlaygroundStyle(block)"
         />
       </template>
@@ -287,16 +275,19 @@ function getTabsForComponentLanding(
         <!-- eslint-enable vue/no-v-html -->
       </ol>
 
-      <VfTabs
-        v-else-if="getTabsForComponentLanding(block, path)"
-        :items="getTabsForComponentLanding(block, path)!"
+      <nav
+        v-else-if="getLinksForComponentLanding(block, path)"
+        class="docs-content__page-links"
+        aria-label="Component pages"
       >
-        <template #tab="{ item }">
-          <RouterLink :to="getTabTo(item)">
-            {{ item.label }}
-          </RouterLink>
-        </template>
-      </VfTabs>
+        <RouterLink
+          v-for="item in getLinksForComponentLanding(block, path)"
+          :key="item.to"
+          :to="item.to"
+        >
+          {{ item.label }}
+        </RouterLink>
+      </nav>
 
       <ul v-else-if="block.type === 'list'">
         <!-- eslint-disable vue/no-v-html -->
@@ -310,7 +301,7 @@ function getTabsForComponentLanding(
         <!-- eslint-enable vue/no-v-html -->
       </blockquote>
 
-      <VfTable v-else-if="block.type === 'table'" striped>
+      <CmTable v-else-if="block.type === 'table'" striped>
         <template #header>
           <tr>
             <!-- eslint-disable vue/no-v-html -->
@@ -334,7 +325,7 @@ function getTabsForComponentLanding(
           />
           <!-- eslint-enable vue/no-v-html -->
         </tr>
-      </VfTable>
+      </CmTable>
 
       <!-- eslint-disable vue/no-v-html -->
       <div v-else-if="hasHtml(block)" v-html="block.html" />

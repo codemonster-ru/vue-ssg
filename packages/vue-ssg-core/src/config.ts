@@ -1,5 +1,24 @@
 import type { Component } from 'vue'
-import type { VfNavMenuItem, VfTableOfContentsItem } from '@codemonster-ru/vueforge-core'
+
+export interface DocsNavItem {
+  value: string
+  label: string
+  kind?: 'item' | 'group'
+  leadingIcon?: string
+  href?: string
+  to?: string | Record<string, unknown>
+  target?: string
+  rel?: string
+  disabled?: boolean
+  children?: DocsNavItem[]
+}
+
+export interface DocsTocItem {
+  id: string
+  label: string
+  level?: number
+  href?: string
+}
 
 export interface DocsSectionConfig {
   label?: string
@@ -35,7 +54,7 @@ export interface DocsHomeConfig {
 }
 
 export interface DocsHeaderNavConfig {
-  items?: VfNavMenuItem[]
+  items?: DocsNavItem[]
   ariaLabel?: string
 }
 
@@ -89,28 +108,28 @@ export interface DocsFooterProps {
 
 export interface DocsHeaderNavProps {
   site: DocsSiteConfig
-  items: VfNavMenuItem[]
+  items: DocsNavItem[]
   activeValue?: string
 }
 
 export interface DocsSidebarProps {
   site: DocsSiteConfig
   page: DocsPageMeta
-  items: VfNavMenuItem[]
+  items: DocsNavItem[]
 }
 
 export interface DocsAsideProps {
   site: DocsSiteConfig
   page: DocsPageMeta
-  items: VfTableOfContentsItem[]
+  items: DocsTocItem[]
 }
 
 export interface DocsLayoutProps {
   site: DocsSiteConfig
   page: DocsPageMeta
   layout: Required<DocsLayoutConfig>
-  sidebarItems: VfNavMenuItem[]
-  tocItems: VfTableOfContentsItem[]
+  sidebarItems: DocsNavItem[]
+  tocItems: DocsTocItem[]
 }
 
 export interface DocsComponentsConfig {
