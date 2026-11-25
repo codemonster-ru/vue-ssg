@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { VfTabs } from '@codemonster-ru/vueforge-core'
+import { CmTabs } from '@codemonster-ru/ui-vue'
 import DocsMarkdownRenderer from '@/components/DocsMarkdownRenderer.vue'
 import { docsPages, getDocsPageByPath, loadDocsPageByPath } from '@/content/docs'
 import type { DocsContentBlock, DocsPageShell } from '@/content/docs'
@@ -281,7 +281,7 @@ const renderedBlocks = computed(() => {
         :blocks="componentPageHeaderBlocks"
         :path="currentPage.path"
       />
-      <VfTabs
+      <CmTabs
         v-model="activeComponentTab"
         :items="componentTabs"
       />

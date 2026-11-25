@@ -7,7 +7,7 @@ order: 1
 
 # Theme Runtime
 
-`vueforge-core` provides the runtime pieces needed for light, dark and system
+`@codemonster-ru/ui-vue` provides the runtime pieces needed for light, dark and system
 theme modes.
 
 ## Provider
@@ -22,5 +22,5 @@ to let readers switch between light and dark modes.
 
 ## Body Typography
 
-Apply `font-family: var(--vf-font-family-base)` on `body` in the consuming app
+Apply `font-family: var(--cm-font-family-base)` on `body` in the consuming app
 so regular HTML content follows the same type system as the components.

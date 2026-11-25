@@ -1,14 +1,14 @@
 ---
 title: Overview
 navTitle: Overview
-description: Introduction to the docs workspace built on top of VueForge.
+description: Introduction to the docs workspace built on top of CodeMonster UI.
 order: 0
 ---
 
 # Codemonster Docs
 
 The docs package is the documentation workspace for the Codemonster UI stack.
-It uses the same VueForge foundation and layouts as the rest of the system, so
+It uses the same CodeMonster UI foundation and layouts as the rest of the system, so
 guides and product surfaces stay aligned from the start.
 
 ## Getting Started
@@ -19,11 +19,11 @@ come from the docs source tree instead of being hardcoded in the app shell.
 
 ## Installation
 
-Install the docs package next to the shared VueForge libraries:
+Install the docs package next to the shared CodeMonster UI libraries:
 
 ```bash
 npm install @codemonster-ru/vue-ssg-core
-npm install @codemonster-ru/vueforge-core @codemonster-ru/vueforge-layouts
+npm install @codemonster-ru/ui-vue @codemonster-ru/ui-layouts @codemonster-ru/ui-css @codemonster-ru/ui-tokens
 ```
 
 ## Why this stack

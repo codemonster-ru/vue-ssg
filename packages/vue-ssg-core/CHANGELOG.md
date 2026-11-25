@@ -2,6 +2,11 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.2.0
+
+- Use SSG-owned navigation and table-of-contents types and remove the VueForge installation dependency.
+- Compile Markdown playground source as authored. Update old CodeBlock and Playground specifiers to their CodeMonster UI packages.
+
 ## 2.1.0 - 2026-06-12
 
 ### Minor Changes
