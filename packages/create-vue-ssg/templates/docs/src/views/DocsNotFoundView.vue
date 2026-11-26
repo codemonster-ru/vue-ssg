@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { VfButton } from '@codemonster-ru/vueforge-core'
-import { VfErrorLayout } from '@codemonster-ru/vueforge-layouts'
+import { CmButton } from '@codemonster-ru/ui-vue'
+import { CmErrorLayout } from '@codemonster-ru/ui-layouts'
 import { docsSite } from '@/content/docs'
 
 const router = useRouter()
@@ -13,7 +13,7 @@ function openHome(): void {
 
 <template>
   <main class="docs-not-found">
-    <VfErrorLayout
+    <CmErrorLayout
       class="docs-not-found__error"
       code="404"
       title="Page not found"
@@ -23,10 +23,10 @@ function openHome(): void {
       surface
     >
       <template #actions>
-        <VfButton @click="openHome">
+        <CmButton @click="openHome">
           Go to home
-        </VfButton>
+        </CmButton>
       </template>
-    </VfErrorLayout>
+    </CmErrorLayout>
   </main>
 </template>

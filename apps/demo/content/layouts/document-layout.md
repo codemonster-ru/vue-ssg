@@ -1,13 +1,13 @@
 ---
 title: Document Layout
 navTitle: Document Layout
-description: Recommended page structure for docs sites built with vueforge-layouts.
+description: Recommended page structure for docs sites built with CodeMonster UI.
 order: 1
 ---
 
 # Document Layout
 
-`VfDocumentLayout` is the main layout primitive for documentation pages.
+`CmDocumentLayout` is the main layout primitive for documentation pages.
 
 ## Sidebar + Content + Aside
 
@@ -24,5 +24,5 @@ needs a persistent navigation frame while the article scrolls.
 
 ## Mobile Behavior
 
-Use `hide-sidebar-on-mobile` and `hide-aside-on-mobile` to keep the reading
-experience simple on smaller screens.
+The sidebar and aside are hidden at narrower widths. Provide drawer controls so
+readers can still reach navigation and the table of contents.
