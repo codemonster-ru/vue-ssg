@@ -1,7 +1,7 @@
 {
   "name": "@codemonster-ru/vue-ssg-core",
   "version": "2.2.0",
-  "description": "Core APIs for Codemonster SSG apps.",
+  "description": "Runtime and content APIs for Vue SSG projects.",
   "keywords": [
     "vue",
     "ssg",
@@ -13,7 +13,7 @@
   "type": "module",
   "license": "MIT",
   "author": "Kirill Kolesnikov (https://github.com/kolesnikovKirill)",
-  "homepage": "https://github.com/codemonster-ru/vue-ssg#readme",
+  "homepage": "https://github.com/codemonster-ru/vue-ssg/blob/main/packages/vue-ssg-core/README.md",
   "bugs": {
     "url": "https://github.com/codemonster-ru/vue-ssg/issues"
   },
