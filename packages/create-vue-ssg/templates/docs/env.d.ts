@@ -6,11 +6,6 @@ declare module 'virtual:docs-markdown-playground/*' {
   export default component
 }
 
-declare module '@codemonster-ru/vueforge-codeblock/view' {
-  import type { DefineComponent } from 'vue'
-  export const VfCodeBlock: DefineComponent<Record<string, unknown>, Record<string, unknown>, unknown>
-}
-
 declare module '@/generated/playgroundRegistry.generated' {
   export const docsVirtualPlaygroundRegistry: Record<string, unknown>
   export const docsVirtualPlaygroundSourceRegistry: Record<string, string>

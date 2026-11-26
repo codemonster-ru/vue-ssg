@@ -164,9 +164,9 @@ function getStickyOffsetTop(): number {
     return 0
   }
 
-  const header = document.querySelector<HTMLElement>('.vf-document-layout__header')
-  const layoutSubheader = document.querySelector<HTMLElement>('.vf-document-layout__subheader')
-  const contentSubheader = document.querySelector<HTMLElement>('.vf-document-layout__content-subheader')
+  const header = document.querySelector<HTMLElement>('.cm-document-layout__header')
+  const layoutSubheader = document.querySelector<HTMLElement>('.cm-document-layout__subheader')
+  const contentSubheader = document.querySelector<HTMLElement>('.cm-document-layout__content-subheader')
   const topGap = 16
   let offset = topGap
 

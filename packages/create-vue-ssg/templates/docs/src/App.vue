@@ -2,16 +2,11 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
-import {
-  VfButton,
-  VfDrawer,
-  VfNavMenu,
-  VfTableOfContents,
-  VfThemeProvider,
-  useTableOfContents
-} from '@codemonster-ru/vueforge-core'
-import { VfDocumentLayout, VfStack, useBreakpoint } from '@codemonster-ru/vueforge-layouts'
-import { VueIconify, icons } from '@codemonster-ru/vueforge-icons'
+import { bars, fileText } from '@codemonster-ru/ui-icons'
+import { CmDocumentLayout, useBreakpoint } from '@codemonster-ru/ui-layouts'
+import { CmButton, CmIcon, CmStack, CmTableOfContents, VfThemeProvider } from '@codemonster-ru/ui-vue'
+import { VfDrawer, VfNavMenu, useTableOfContents } from '@codemonster-ru/ui-vue/historical'
+import type { DocsTocItem } from '@codemonster-ru/vue-ssg-core'
 import { docsSite } from '@/content/docs'
 import defaultFaviconUrl from '@/assets/default-favicon.svg?url'
 import {
@@ -26,7 +21,6 @@ import {
   loadDocsPageByPath,
   loadDocsSearchIndex
 } from '@/content/docs'
-import type { VfTableOfContentsItem } from '@codemonster-ru/vueforge-core'
 import DocsDefaultHeader from '@/components/DocsDefaultHeader.vue'
 
 const faviconHref = computed(() => docsSite.favicon ?? defaultFaviconUrl)
@@ -64,7 +58,7 @@ interface DocsSearchItem {
 }
 const docsSearchIndex = ref<DocsSearchItem[]>([])
 const currentPageShell = computed(() => getDocsPageByPath(route.path))
-const currentPagePayload = ref<{ blocks: DocsContentBlock[]; tableOfContents: VfTableOfContentsItem[] } | null>(null)
+const currentPagePayload = ref<{ blocks: DocsContentBlock[]; tableOfContents: DocsTocItem[] } | null>(null)
 const currentPage = computed(() => ({
   ...currentPageShell.value,
   blocks: currentPagePayload.value?.blocks ?? [],
@@ -135,9 +129,9 @@ function computeStickyOffsetTop(): number {
     return docsScrollOffset
   }
 
-  const header = document.querySelector<HTMLElement>('.vf-document-layout__header')
-  const layoutSubheader = document.querySelector<HTMLElement>('.vf-document-layout__subheader')
-  const contentSubheader = document.querySelector<HTMLElement>('.vf-document-layout__content-subheader')
+  const header = document.querySelector<HTMLElement>('.cm-document-layout__header')
+  const layoutSubheader = document.querySelector<HTMLElement>('.cm-document-layout__subheader')
+  const contentSubheader = document.querySelector<HTMLElement>('.cm-document-layout__content-subheader')
   const topGap = 16
   let offset = topGap
 
@@ -197,7 +191,7 @@ const updateSidebarIndicator = () => {
     return
   }
 
-  const navMenu = root.querySelector<HTMLElement>('.vf-nav-menu')
+  const navMenu = root.querySelector<HTMLElement>('.cm-nav-menu')
 
   if (!navMenu) {
     sidebarIndicatorVisible.value = false
@@ -205,7 +199,7 @@ const updateSidebarIndicator = () => {
   }
 
   const topLevelNodes = navMenu.querySelectorAll<HTMLElement>(
-    ':scope > .vf-nav-menu__list > .vf-nav-menu__node'
+    ':scope > .cm-nav-menu__list > .cm-nav-menu__node'
   )
   const activeNode = topLevelNodes.item(topLevelIndex)
 
@@ -230,7 +224,7 @@ const updateTocIndicator = () => {
     return
   }
 
-  const activeLink = root.querySelector<HTMLElement>('.vf-table-of-contents__link--active')
+  const activeLink = root.querySelector<HTMLElement>('.cm-table-of-contents__link--active')
 
   if (!activeLink) {
     tocIndicatorVisible.value = false
@@ -367,7 +361,7 @@ watch(isMobileTocOpen, (open) => {
 
 function handleMobileTocClick(event: MouseEvent) {
   const target = event.target as HTMLElement | null
-  const link = target?.closest<HTMLAnchorElement>('.vf-table-of-contents__link')
+  const link = target?.closest<HTMLAnchorElement>('.cm-table-of-contents__link')
 
   if (!link) {
     return
@@ -397,8 +391,8 @@ useHead({
 </script>
 
 <template>
-  <VfThemeProvider>
-    <VfDocumentLayout
+  <VfThemeProvider storage-key="codemonster-docs-theme">
+    <CmDocumentLayout
       :layout="shellLayout"
       :fill-viewport="docsLayout.fillViewport"
       :sticky-header="docsLayout.stickyHeader"
@@ -429,7 +423,7 @@ useHead({
 
       <template #content-subheader>
         <div class="docs-content-subheader">
-          <VfButton
+          <CmButton
             v-if="!isLgUp"
             size="sm"
             variant="ghost"
@@ -437,11 +431,11 @@ useHead({
             @click="isMobileSidebarOpen = true"
           >
             <span class="docs-content-subheader__action-content">
-              <VueIconify :icon="icons.bars" :size="14" aria-hidden="true" />
+              <CmIcon :icon="bars" :size="14" aria-hidden="true" />
               <span>Navigation</span>
             </span>
-          </VfButton>
-          <VfButton
+          </CmButton>
+          <CmButton
             v-if="hasMobileToc"
             size="sm"
             variant="ghost"
@@ -449,15 +443,15 @@ useHead({
             @click="isMobileTocOpen = true"
           >
             <span class="docs-content-subheader__action-content">
-              <VueIconify :icon="icons.fileText" :size="14" aria-hidden="true" />
+              <CmIcon :icon="fileText" :size="14" aria-hidden="true" />
               <span>On this page</span>
             </span>
-          </VfButton>
+          </CmButton>
         </div>
       </template>
 
       <template v-if="!isContentOnlyRoute" #sidebar>
-        <VfStack gap="1rem">
+        <CmStack gap="1rem">
           <component
             :is="docsComponents.SidebarTop"
             v-if="docsComponents.SidebarTop"
@@ -474,14 +468,14 @@ useHead({
                 height: `${sidebarIndicatorHeight}px`
               }"
             />
-            <VfNavMenu :items="docsSidebar" :model-value="currentPage.id" />
+            <VfNavMenu variant="sidebar" :items="docsSidebar" :model-value="currentPage.id" />
           </div>
           <component
             :is="docsComponents.SidebarBottom"
             v-if="docsComponents.SidebarBottom"
             v-bind="sidebarProps"
           />
-        </VfStack>
+        </CmStack>
       </template>
 
       <template #default>
@@ -489,7 +483,7 @@ useHead({
       </template>
 
       <template v-if="!isContentOnlyRoute" #aside>
-        <VfStack gap="1rem">
+        <CmStack gap="1rem">
           <component
             :is="docsComponents.AsideTop"
             v-if="docsComponents.AsideTop"
@@ -509,10 +503,10 @@ useHead({
                 height: `${tocIndicatorHeight}px`
               }"
             />
-            <VfTableOfContents
+            <CmTableOfContents
               :items="currentPage.tableOfContents"
               :active-id="activeId"
-              label="On this page"
+              aria-label="On this page"
               smooth
               :scroll-offset="tocScrollOffset"
             />
@@ -522,7 +516,7 @@ useHead({
             v-if="docsComponents.AsideBottom"
             v-bind="asideProps"
           />
-        </VfStack>
+        </CmStack>
       </template>
 
       <template #footer>
@@ -536,7 +530,7 @@ useHead({
           <span v-if="docsFooter.right">{{ docsFooter.right }}</span>
         </div>
       </template>
-    </VfDocumentLayout>
+    </CmDocumentLayout>
 
     <VfDrawer
       :open="isMobileSidebarOpen"
@@ -551,7 +545,7 @@ useHead({
 
       <template #default>
         <div class="docs-header-drawer">
-          <VfNavMenu :items="docsSidebar" :model-value="currentPage.id" aria-label="Documentation navigation" />
+          <VfNavMenu variant="sidebar" :items="docsSidebar" :model-value="currentPage.id" aria-label="Documentation navigation" />
         </div>
       </template>
     </VfDrawer>
@@ -569,11 +563,11 @@ useHead({
 
       <template #default>
         <div class="docs-header-drawer" @click.capture="handleMobileTocClick">
-          <VfTableOfContents
+          <CmTableOfContents
             v-if="hasMobileToc"
             :items="mobileTocItems"
             :active-id="activeId"
-            label="On this page"
+            aria-label="On this page"
             smooth
             :scroll-offset="tocScrollOffset"
           />
