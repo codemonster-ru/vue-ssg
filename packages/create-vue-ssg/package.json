@@ -1,7 +1,7 @@
 {
   "name": "@codemonster-ru/create-vue-ssg",
   "version": "2.1.0",
-  "description": "Scaffold a Codemonster SSG project.",
+  "description": "Scaffolding CLI for Vue SSG projects.",
   "keywords": [
     "create",
     "scaffold",
@@ -13,7 +13,7 @@
   "type": "module",
   "license": "MIT",
   "author": "Kirill Kolesnikov (https://github.com/kolesnikovKirill)",
-  "homepage": "https://github.com/codemonster-ru/vue-ssg#readme",
+  "homepage": "https://github.com/codemonster-ru/vue-ssg/blob/main/packages/create-vue-ssg/README.md",
   "bugs": {
     "url": "https://github.com/codemonster-ru/vue-ssg/issues"
   },
