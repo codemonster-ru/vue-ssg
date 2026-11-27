@@ -1,6 +1,6 @@
 {
   "name": "@codemonster-ru/vue-ssg-core",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Runtime and content APIs for Vue SSG projects.",
   "keywords": [
     "vue",

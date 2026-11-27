@@ -2,6 +2,10 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.2.1 - 2026-11-27
+
+- Publish from the corrected project history with fresh npm provenance.
+
 ## 2.2.0
 
 - Use SSG-owned navigation and table-of-contents types and remove the VueForge installation dependency.

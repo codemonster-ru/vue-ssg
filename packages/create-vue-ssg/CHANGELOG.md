@@ -2,6 +2,10 @@
 
 <!-- markdownlint-disable MD024 -->
 
+## 2.1.1 - 2026-11-27
+
+- Publish from the corrected project history with fresh npm provenance.
+
 ## 2.1.0
 
 - Generate both templates with Vue SSG Core 2.2.0 and migrate the docs shell to CodeMonster UI.
