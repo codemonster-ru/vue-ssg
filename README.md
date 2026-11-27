@@ -47,4 +47,7 @@ Run `npm ci` at the repository root. `npm run dev` serves the workspace demo in
 Use [GitHub Issues](https://github.com/codemonster-ru/vue-ssg/issues) for questions,
 feature requests, and reproducible bugs.
 
+Follow the [contribution guide](./CONTRIBUTING.md) to propose changes.
+Report vulnerabilities through the [security policy](./SECURITY.md).
+
 Part of [CodeMonster](https://github.com/codemonster-ru). Licensed under the [MIT License](./LICENSE).
